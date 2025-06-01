@@ -37,7 +37,7 @@ chrome@136.0.7103.113 /Users/me/project-name/chrome/mac_arm-136.0.7103.113/chrom
 The paths output by the install command can be placed into the web-ext.config.ts file
 
 ```ts web-ext.config.ts
-import { defineWebExtConfig } from "wxt";
+import { defineWebExtConfig } from 'wxt';
 
 export default defineWebExtConfig({
   // IMPORTANT: install the puppeteer browser binaries and specify the paths here for development
@@ -158,7 +158,7 @@ If you have an assets folder like this:
 then you can import the file directly elsewhere in the project (other than content scripts) like this:
 
 ```ts
-import "~/assets/tailwind.css"
+import '~/assets/tailwind.css'
 ```
 
 or in an html file:
@@ -219,17 +219,25 @@ The combination of these two scripts also requires manifest permissions for scri
 
 Example manifest fields that cover the required settings for this feature:
 
-```json
+```ts
+/** wxt.config.ts */
 
-   optional_host_permissions: ["*://*/*",], // for chrome/mv3
-   optional_permissions: ["*://*/*"], // for firefox/mv2
-   permissions: [
-     "storage",
-     "scripting",
-     "contextMenus",
-     "activeTab",
-   ],
-   action: {},
+export default defineConfig({
+  // ...
+  manifest: {
+    optional_host_permissions: ['*://*/*',], // for chrome/mv3
+    optional_permissions: ['*://*/*'], // for firefox/mv2
+    permissions: [
+      'storage',
+      'scripting',
+      'contextMenus',
+      'activeTab',
+    ],
+    action: {},
+    // ...
+  },
+  // ...
+})
 ```
 
 ### development quirks
@@ -240,41 +248,53 @@ To work around this for development, we need to add a WXT hook to the config tha
 
 so for a script at `entrypoints/content/index.ts` with `matches: ['*://*.google.com/*'],`, we would need to add this to the `hooks` field of `wxt.config.ts`:
 
-```ts wxt.config.json
-   hooks: {
-      "build:manifestGenerated": (wxt, manifest) => {
-         if (wxt.config.command === "serve") {
-            manifest.content_scripts ??= [];
-            manifest.content_scripts.push({
-               matches: ['*://*.google.com/*'],
-               js: ["/content-scripts/content.js"],
-               // If the script has CSS, add it here.
-         });
-         }
-      },
-   },
+```ts
+/** wxt.config.ts */
+
+export default defineConfig({
+  // ...
+  hooks: {
+    'build:manifestGenerated': (wxt, manifest) => {
+      if (wxt.config.command === 'serve') {
+        manifest.content_scripts ??= [];
+        manifest.content_scripts.push({
+          matches: ['*://*.google.com/*'],
+          js: ['/content-scripts/content.js'],
+          // If the script has CSS, add it here.
+        });
+      }
+    },
+  },
+  // ...
+})
 ```
 
 And if we added another content script at `entrypoints/another.content/index.tsx` with `matches: ['*://*.wxt.dev/*'],`, we would need to add this to the `hooks` field of `wxt.config.ts`:
 
-```ts wxt.config.json
-   hooks: {
-      "build:manifestGenerated": (wxt, manifest) => {
-         if (wxt.config.command === "serve") {
-            manifest.content_scripts ??= [];
-            manifest.content_scripts.push({
-               matches: ['*://*.google.com/*'],
-               js: ["/content-scripts/content.js"],
-               // If the script has CSS, add it here.
-         });
-            manifest.content_scripts.push({
-               matches: ['*://*.wxt.dev/*'],
-               js: ["/content-scripts/another.js"],
-               // If the script has CSS, add it here.
-         });
-         }
-      },
-   },
+```ts
+/** wxt.config.ts */
+
+export default defineConfig({
+  // ...
+  hooks: {
+    'build:manifestGenerated': (wxt, manifest) => {
+      if (wxt.config.command === 'serve') {
+        manifest.content_scripts ??= [];
+        manifest.content_scripts.push({
+          matches: ['*://*.google.com/*'],
+          js: ['/content-scripts/content.js'],
+          // If the script has CSS, add it here.
+        });
+        manifest.content_scripts.push({
+          matches: ['*://*.wxt.dev/*'],
+          js: ['/content-scripts/another.js'],
+          // If the script has CSS, add it here.
+        });
+      }
+    },
+  },
+  // ...
+})
 ```
 
 Note that these will be overridden in the manifest by the actual settings in the routes, so you do not need to mirror all of [the manifest fields that content scripts can specify](https://wxt.dev/guide/essentials/entrypoints.html#content-scripts) from the entrypoint routes - just the `matches` field and the name of the output file.

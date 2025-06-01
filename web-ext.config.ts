@@ -1,4 +1,4 @@
-import { defineWebExtConfig } from "wxt";
+import { defineWebExtConfig } from 'wxt';
 
 export default defineWebExtConfig({
   // IMPORTANT: install the puppeteer browser binaries and specify the paths here for development

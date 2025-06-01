@@ -1,4 +1,4 @@
-import { defineContentScript } from "#imports"; // WXT built-ins
+import { defineContentScript } from '#imports'; // WXT built-ins
 
 export default defineContentScript({
   /**
@@ -7,8 +7,8 @@ export default defineContentScript({
    * but it does not reflect the permissions required to actually run.
    * Permissions must be defined in the manifest or manually added by the user.
    */
-  matches: ["*://*.google.com/*"],
+  matches: ['*://*.google.com/*'],
   main() {
-    console.log("hello from entrypoints/content/index.ts");
+    console.log('hello from entrypoints/content/index.ts');
   },
 });

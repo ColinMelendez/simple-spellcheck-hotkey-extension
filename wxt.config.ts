@@ -1,5 +1,5 @@
-import { defineConfig } from 'wxt';
 import tailwindcss from '@tailwindcss/vite'
+import { defineConfig } from 'wxt';
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -14,7 +14,7 @@ export default defineConfig({
     web_accessible_resources: [],
     // Chrome needs this to allow the extension to ask users for permissions on mv3
     optional_host_permissions: ['*://*/*'],
-    // @ts-ignore: Firefox needs this to allow the extension to ask users for permissions on mv2
+    // @ts-expect-error: Firefox needs this to allow the extension to ask users for permissions on mv2
     optional_permissions: ['*://*/*'],
     permissions: [
       'storage',
@@ -27,8 +27,8 @@ export default defineConfig({
   },
   // WXT build hooks
   hooks: {
-    "build:manifestGenerated": (wxt, manifest) => {
-      if (wxt.config.command === "serve") {
+    'build:manifestGenerated': (wxt, manifest) => {
+      if (wxt.config.command === 'serve') {
         // During development, content scripts are not listed in manifest at
         // all times, causing "webext-dynamic-content-scripts" to throw an error.
         // So we need to add them manually.
@@ -37,7 +37,7 @@ export default defineConfig({
         manifest.content_scripts ??= [];
         manifest.content_scripts.push({
           matches: ['*://*.google.com/*'],
-          js: ["/content-scripts/content.js"],
+          js: ['/content-scripts/content.js'],
           // If the script has CSS, add it here.
         });
       }
@@ -46,8 +46,8 @@ export default defineConfig({
   webExt: {
     // These URLs will be automatically opened when running the dev server
     startUrls: [
-      "https://wxt.dev",
-      "https://google.com",
+      'https://wxt.dev',
+      'https://google.com',
     ],
   },
   // Disable WXT auto-imports - use manual imports instead
