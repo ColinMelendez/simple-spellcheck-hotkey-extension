@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Post-Install Welcome Page</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="~/assets/tailwind.css" />
+  </head>
+  <body class="flex flex-col items-center justify-center gap-4 p-4">
+    <h1 class="text-lg font-bold">Welcome to the extension!</h1>
+    <p>
+      This page is intended to be shown in a new tab when a user first installs the extension;
+      triggered by the background script/worker.
+    </p>
+    <p>
+      You can edit this page under
+      <code>entrypoints/welcome-page/index.html</code>.
+    </p>
+    <p>
+      This page is styled with
+      <a class="text-blue-500 underline" href="https://tailwindcss.com/" target="_blank">
+        TailwindCSS
+      </a>
+      .
+    </p>
+  </body>
+</html>
