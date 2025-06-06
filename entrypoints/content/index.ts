@@ -1,4 +1,5 @@
 import { defineContentScript } from '#imports'; // WXT built-ins
+import { applyOverlayToSelection } from './active-selection-scramble';
 
 export default defineContentScript({
   /**
@@ -10,5 +11,15 @@ export default defineContentScript({
   matches: ['*://*.google.com/*'],
   main() {
     console.log('hello from entrypoints/content/index.ts');
+
+    const settings = {
+      scramble_density: 0.5,
+    };
+
+    document.addEventListener('selectionchange', () => {
+      requestAnimationFrame(applyOverlayToSelection(settings));
+    });
+
+    // const port = browser.runtime.sendMessage({ name: 'content-script' });
   },
 });

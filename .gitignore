@@ -23,3 +23,6 @@ stats-*.json
 *.njsproj
 *.sln
 *.sw?
+
+firefox
+chrome
