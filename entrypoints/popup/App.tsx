@@ -1,41 +1,53 @@
-import { useState } from 'react';
-import reactLogo from '@/assets/react.svg';
-import wxtLogo from '/wxt.svg';
+import { browser } from '#imports'; // WXT built-ins
+import { useEffect, useState } from 'react';
+
+// Default settings, which will be updated from storage
+const initialSettings = {
+  scramble_density: 0.7,
+};
 
 function App() {
-  const [count, setCount] = useState(0);
+  const [settings, setSettings] = useState(initialSettings);
+  const scrambleDensity = settings.scramble_density;
+
+  // On popup open, ask the background script for the latest settings
+  useEffect(() => {
+    browser.runtime.sendMessage({ type: 'getSettings' }).then((response) => {
+      if (response?.settings) {
+        console.log('settings', response.settings);
+        setSettings(response.settings);
+      }
+    }).catch(err => console.error('Could not get settings from background script', err));
+  }, []);
 
   return (
-    <div className="max-w-screen-xl mx-auto p-8 text-center">
-      <div className="flex justify-center">
-        <a href="https://wxt.dev" target="_blank" rel="noopener noreferrer">
-          <img src={wxtLogo} className="h-24 p-6 transition-all duration-300 ease-linear hover:drop-shadow-[0_0_2em_#54bc4ae0]" alt="WXT logo" />
-        </a>
-        <a href="https://react.dev" target="_blank" rel="noopener noreferrer">
-          <img src={reactLogo} className="h-24 p-6 transition-all duration-300 ease-linear motion-safe:animate-spin-slow hover:drop-shadow-[0_0_2em_#61dafbaa]" alt="React logo" />
-        </a>
-      </div>
-      <h1 className="text-5xl leading-tight">WXT + React</h1>
-      <div className="p-8">
-        <button
-          type="button"
-          onClick={() => setCount(count => count + 1)}
-          className="rounded-lg border border-transparent px-5 py-3 text-base font-medium font-inherit bg-[#1a1a1a] cursor-pointer transition-colors duration-300 hover:border-[#646cff] focus:outline-4 focus:outline-auto focus:outline-[-webkit-focus-ring-color] dark:bg-[#f9f9f9]"
-        >
-          count is
-          {' '}
-          {count}
-        </button>
-        <p className="mt-4">
-          Edit
-          {' '}
-          <code>src/App.tsx</code>
-          {' '}
-          and save to test HMR
+    <div className="mx-auto max-w-screen-md p-4 text-center">
+      <h1 className="text-xl leading-tight">Text Scrambler Settings</h1>
+      <div className="p-4">
+        <label htmlFor="scramble-density" className="mb-2 block text-sm font-medium">
+          Scramble Density:
+          <span className="ml-2 font-mono">{scrambleDensity.toFixed(2)}</span>
+        </label>
+        <input
+          id="scramble-density"
+          type="range"
+          min="0"
+          max="1"
+          step="0.01"
+          value={scrambleDensity}
+          onChange={(e) => {
+            console.log('e.target.value', e.target.value);
+            browser.runtime.sendMessage({ type: 'setSettings', settings });
+            setSettings({ ...settings, scramble_density: Number.parseFloat(e.target.value) });
+          }}
+          className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
+        />
+        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+          Controls the percentage of characters that are scrambled.
         </p>
       </div>
-      <p className="text-[#888]">
-        Click on the WXT and React logos to learn more
+      <p className="text-xs text-gray-500 dark:text-gray-400">
+        Changes are saved automatically and applied to all tabs.
       </p>
     </div>
   );
