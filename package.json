@@ -20,6 +20,7 @@
     "lint:fix": "eslint --fix"
   },
   "dependencies": {
+    "effect": "^3.16.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "webext-dynamic-content-scripts": "^10.0.4",

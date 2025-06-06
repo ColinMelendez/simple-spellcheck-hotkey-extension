@@ -1,6 +1,7 @@
-import { env } from 'node:process';
 import { browser, defineBackground } from '#imports'; // WXT built-ins
+import { Effect, Schema } from 'effect';
 import addPermissionToggle from 'webext-permission-toggle';
+import { SettingsSchema, SettingsServiceLive, SettingsServiceTag } from '@/lib/settings';
 import 'webext-dynamic-content-scripts'; // auto-refresh content-scripts when permissions change
 
 export default defineBackground({
@@ -30,19 +31,30 @@ export default defineBackground({
         }
       });
 
-      // Listen for messages from content scripts
+      const getSettings = Effect.flatMap(SettingsServiceTag, s => s.get);
+      const setSettings = (settings: unknown) =>
+        Effect.flatMap(SettingsServiceTag, s =>
+          Effect.succeed(settings).pipe(
+            Effect.flatMap(Schema.decodeUnknown(SettingsSchema)),
+            Effect.flatMap(decoded => s.set(decoded)),
+          ));
+      const runnableGet = Effect.provide(getSettings, SettingsServiceLive);
+      const runnableSet = (s: unknown) => Effect.provide(setSettings(s), SettingsServiceLive);
+
       browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
         if (message.type === 'getSettings') {
-          (async () => {
-            const data = await browser.storage.sync.get('settings');
-            // Provide default settings if none are stored
-            const settings = data.settings || { scramble_density: 0.7 };
-            sendResponse({ settings });
-          })();
+          Effect.runPromise(runnableGet)
+            .then(settings => sendResponse({ settings }))
+            .catch((error) => {
+              console.error('Failed to get settings', error);
+              sendResponse({ error: error.message });
+            });
           return true; // Indicates that the response is sent asynchronously
         }
         else if (message.type === 'setSettings') {
-          browser.storage.sync.set({ settings: message.settings });
+          Effect.runPromise(runnableSet(message.settings)).catch((error) => {
+            console.error('Failed to set settings', error);
+          });
         }
       });
 
@@ -53,14 +65,15 @@ export default defineBackground({
           browser.tabs.query({}).then((tabs) => {
             for (const tab of tabs) {
               if (tab.id) {
-                browser.tabs.sendMessage(tab.id, {
-                  type: 'settingsUpdated',
-                  settings: newSettings,
-                }).catch((error) => {
-                  // It's expected that some tabs won't have the content script injected.
-                  if (!error.message.includes('Receiving end does not exist'))
-                    console.error(`Failed to send message to tab ${tab.id}:`, error);
-                });
+                browser.tabs
+                  .sendMessage(tab.id, {
+                    type: 'settingsUpdated',
+                    settings: newSettings,
+                  })
+                  .catch((error) => {
+                    if (!error.message.includes('Receiving end does not exist'))
+                      console.error(`Failed to send message to tab ${tab.id}:`, error);
+                  });
               }
             }
           });
