@@ -1,14 +1,29 @@
 import { browser } from '#imports'; // WXT built-ins
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 // Default settings, which will be updated from storage
 const initialSettings = {
   scramble_density: 0.7,
 };
 
+function simpleDebounce(fn: (...args: unknown[]) => void, delay: number) {
+  let timeoutId: NodeJS.Timeout | undefined;
+  return (...args: unknown[]) => {
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
+    timeoutId = setTimeout(() => fn(...args), delay);
+  };
+}
+
+const sendSettings = simpleDebounce((settings) => {
+  browser.runtime.sendMessage({ type: 'setSettings', settings });
+}, 500);
+
 function App() {
   const [settings, setSettings] = useState(initialSettings);
   const scrambleDensity = settings.scramble_density;
+  const isInitialMount = useRef(true);
 
   // On popup open, ask the background script for the latest settings
   useEffect(() => {
@@ -19,6 +34,16 @@ function App() {
       }
     }).catch(err => console.error('Could not get settings from background script', err));
   }, []);
+
+  // Debounce sending settings to the background script
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+
+    sendSettings();
+  }, [settings]);
 
   return (
     <div className="mx-auto max-w-screen-md p-4 text-center">
@@ -36,8 +61,6 @@ function App() {
           step="0.01"
           value={scrambleDensity}
           onChange={(e) => {
-            console.log('e.target.value', e.target.value);
-            browser.runtime.sendMessage({ type: 'setSettings', settings });
             setSettings({ ...settings, scramble_density: Number.parseFloat(e.target.value) });
           }}
           className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
