@@ -1,4 +1,4 @@
-import { browser } from '#imports'; // WXT built-ins
+import { browser, useCallback } from '#imports'; // WXT built-ins
 import { useEffect, useRef, useState } from 'react';
 
 // Default settings, which will be updated from storage
@@ -17,7 +17,7 @@ function simpleDebounce(fn: (...args: unknown[]) => void, delay: number) {
 }
 
 const sendSettings = simpleDebounce((settings) => {
-  browser.runtime.sendMessage({ type: 'setSettings', settings });
+  void browser.runtime.sendMessage({ type: 'setSettings', settings });
 }, 500);
 
 function App() {
@@ -28,11 +28,14 @@ function App() {
   // On popup open, ask the background script for the latest settings
   useEffect(() => {
     browser.runtime.sendMessage({ type: 'getSettings' }).then((response) => {
+      // eslint-disable-next-line ts/strict-boolean-expressions, ts/no-unsafe-member-access
       if (response?.settings) {
+        // eslint-disable-next-line ts/no-unsafe-member-access
         console.log('settings', response.settings);
+        // eslint-disable-next-line ts/no-unsafe-argument, ts/no-unsafe-member-access
         setSettings(response.settings);
       }
-    }).catch(err => console.error('Could not get settings from background script', err));
+    }).catch((err) => console.error('Could not get settings from background script', err));
   }, []);
 
   // Debounce sending settings to the background script
@@ -43,6 +46,10 @@ function App() {
     }
 
     sendSettings();
+  }, [settings]);
+
+  const onChangeUpdateSettings = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setSettings({ ...settings, scramble_density: Number.parseFloat(e.target.value) });
   }, [settings]);
 
   return (
@@ -60,16 +67,25 @@ function App() {
           max="1"
           step="0.01"
           value={scrambleDensity}
-          onChange={(e) => {
-            setSettings({ ...settings, scramble_density: Number.parseFloat(e.target.value) });
-          }}
-          className="h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200 dark:bg-gray-700"
+          onChange={onChangeUpdateSettings}
+          className={`
+            h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200
+            dark:bg-gray-700
+          `}
         />
-        <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+        <p className={`
+          mt-2 text-xs text-gray-500
+          dark:text-gray-400
+        `}
+        >
           Controls the percentage of characters that are scrambled.
         </p>
       </div>
-      <p className="text-xs text-gray-500 dark:text-gray-400">
+      <p className={`
+        text-xs text-gray-500
+        dark:text-gray-400
+      `}
+      >
         Changes are saved automatically and applied to all tabs.
       </p>
     </div>

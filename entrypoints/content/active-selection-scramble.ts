@@ -1,5 +1,5 @@
 /**
- * @fileoverview
+ * @file
  * This module supplies a function that listens for text selection changes in the browser and overlays the
  * selected text with a random string of characters. The overlay is purely visual and does not modify the DOM
  * or the original text content. It is removed automatically when the selection changes or is cleared.
@@ -18,7 +18,7 @@ const activeOverlays: HTMLElement[] = [];
  * @returns A random character with matching case
  * @internal
  */
-function getRandomChar(char: string, scrambleDensity: number): string {
+function getRandomChar(char: string, scrambleDensity: number) {
   const upperChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
   const lowerChars = 'abcdefghijklmnopqrstuvwxyz';
   const numChars = '0123456789';
@@ -98,7 +98,7 @@ export function applyOverlayToSelection(
 
       // Generate random text with the same length as the original text
       const randomText = Array.from(text)
-        .map(char => getRandomChar(char, settings.scramble_density))
+        .map((char) => getRandomChar(char, settings.scramble_density))
         .join('');
 
       overlay.textContent = randomText;

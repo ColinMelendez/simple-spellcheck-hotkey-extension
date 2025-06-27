@@ -23,7 +23,7 @@ export default defineBackground({
         console.log('onInstalled', details);
 
         if (details.reason === 'install') {
-          browser.tabs.create({
+          void browser.tabs.create({
             url: browser.runtime.getURL('/welcome-page.html'),
           });
         }
@@ -31,33 +31,40 @@ export default defineBackground({
 
       // Listen for messages from content scripts
       browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        // eslint-disable-next-line ts/no-unsafe-member-access
         if (message.type === 'getSettings') {
-          (async () => {
+          void (async () => {
             const data = await browser.storage.sync.get('settings');
             // Provide default settings if none are stored
-            const settings = data.settings || { scramble_density: 0.7 };
+            // eslint-disable-next-line ts/no-unsafe-assignment
+            const settings = data.settings !== undefined ? data.settings : { scramble_density: 0.7 };
+            // eslint-disable-next-line ts/no-unsafe-assignment
             sendResponse({ settings });
           })();
           return true; // Indicates that the response is sent asynchronously
         }
+        // eslint-disable-next-line ts/no-unsafe-member-access
         else if (message.type === 'setSettings') {
-          browser.storage.sync.set({ settings: message.settings });
+          // eslint-disable-next-line ts/no-unsafe-assignment, ts/no-unsafe-member-access
+          void browser.storage.sync.set({ settings: message.settings });
         }
       });
 
       // Push settings updates to content scripts when they change
       browser.storage.onChanged.addListener((changes, areaName) => {
         if (areaName === 'sync' && changes.settings) {
+          // eslint-disable-next-line ts/no-unsafe-assignment
           const newSettings = changes.settings.newValue;
-          browser.tabs.query({}).then((tabs) => {
+          void browser.tabs.query({}).then((tabs) => {
             for (const tab of tabs) {
-              if (tab.id) {
-                browser.tabs.sendMessage(tab.id, {
+              if (tab.id !== null) {
+                void browser.tabs.sendMessage(tab.id as number, {
                   type: 'settingsUpdated',
+                  // eslint-disable-next-line ts/no-unsafe-assignment
                   settings: newSettings,
-                }).catch((error) => {
+                }).catch((error: unknown) => {
                   // It's expected that some tabs won't have the content script injected.
-                  if (!error.message.includes('Receiving end does not exist'))
+                  if (error instanceof Error && !error.message.includes('Receiving end does not exist'))
                     console.error(`Failed to send message to tab ${tab.id}:`, error);
                 });
               }

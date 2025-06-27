@@ -107,7 +107,6 @@
     "import/newline-after-import": "error",
 
     "import/no-cycle": "error",
-    "import/unambiguous": "error",
     "import/export": "error",
     "import/named": "error",
 

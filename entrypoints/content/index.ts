@@ -24,16 +24,22 @@ export default defineContentScript({
 
     // Request initial settings from the background script
     browser.runtime.sendMessage({ type: 'getSettings' }).then((response) => {
+      // eslint-disable-next-line ts/strict-boolean-expressions, ts/no-unsafe-member-access
       if (response?.settings) {
+        // eslint-disable-next-line ts/no-unsafe-member-access
         console.log('Applying initial settings from background:', response.settings);
+        // eslint-disable-next-line ts/no-unsafe-member-access
         Object.assign(settings, response.settings);
       }
-    }).catch(err => console.error('Could not get settings from background script', err));
+    }).catch((err) => console.error('Could not get settings from background script', err));
 
     // Listen for settings updates from the background script
     browser.runtime.onMessage.addListener((message) => {
+      // eslint-disable-next-line ts/strict-boolean-expressions, ts/no-unsafe-member-access
       if (message.type === 'settingsUpdated' && message.settings) {
+        // eslint-disable-next-line ts/no-unsafe-member-access
         console.log('Settings updated:', message.settings);
+        // eslint-disable-next-line ts/no-unsafe-member-access
         Object.assign(settings, message.settings);
       }
     });
