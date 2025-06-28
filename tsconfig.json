@@ -1,6 +1,11 @@
 {
   "extends": "./.wxt/tsconfig.json",
   "compilerOptions": {
+    "plugins": [
+      {
+        "name": "@effect/language-service"
+      }
+    ],
     "target": "es2024",
     "jsx": "preserve",
     "lib": ["ES2024", "DOM", "DOM.Iterable", "WebWorker"],
