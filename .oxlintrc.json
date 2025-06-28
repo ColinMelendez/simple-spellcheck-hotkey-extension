@@ -81,6 +81,7 @@
 
     "prefer-object-has-own": "error",
     "operator-assignment": "error",
+    "require-yield": "off",
 
     "node/no-new-require": "error",
     "node/no-exports-assign": "warn",

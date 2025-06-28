@@ -46,6 +46,9 @@ export default antfu({
     // make unused values warnings instead of errors for less visual noise while coding
     'unused-imports/no-unused-vars': 'warn',
 
+    // allow for redeclarations to enable type and interface shadowing (useful for schemas)
+    'ts/no-redeclare': 'off',
+
     // use the recommended rules from the better-tailwindcss plugin
     ...eslintPluginBetterTailwindcss.configs.recommended.rules,
 
