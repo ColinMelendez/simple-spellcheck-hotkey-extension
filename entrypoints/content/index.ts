@@ -1,4 +1,5 @@
 import { browser, defineContentScript } from '#imports'; // WXT built-ins
+import { DEFAULT_SCRAMBLE_DENSITY } from '@/lib/Domain/global-defaults';
 import { applyOverlayToSelection } from './active-selection-scramble';
 
 export default defineContentScript({
@@ -13,7 +14,7 @@ export default defineContentScript({
     console.log('hello from entrypoints/content/index.ts');
 
     const settings = {
-      scramble_density: 0.5, // Default value, will be updated from storage
+      scramble_density: DEFAULT_SCRAMBLE_DENSITY, // Default value, will be updated from storage
     };
 
     // On every selection change, a new overlay function is created with the *current* settings.

@@ -1,5 +1,6 @@
 import { browser, defineBackground } from '#imports'; // WXT built-ins
 import addPermissionToggle from 'webext-permission-toggle';
+import { DEFAULT_SCRAMBLE_DENSITY } from '@/lib/Domain/global-defaults';
 import 'webext-dynamic-content-scripts'; // auto-refresh content-scripts when permissions change
 
 export default defineBackground({
@@ -37,7 +38,7 @@ export default defineBackground({
             const data = await browser.storage.sync.get('settings');
             // Provide default settings if none are stored
             // eslint-disable-next-line ts/no-unsafe-assignment
-            const settings = data.settings !== undefined ? data.settings : { scramble_density: 0.7 };
+            const settings = data.settings !== undefined ? data.settings : { scramble_density: DEFAULT_SCRAMBLE_DENSITY };
             // eslint-disable-next-line ts/no-unsafe-assignment
             sendResponse({ settings });
           })();

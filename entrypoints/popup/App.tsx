@@ -1,9 +1,10 @@
 import { browser, useCallback } from '#imports'; // WXT built-ins
 import { useEffect, useRef, useState } from 'react';
+import { DEFAULT_SCRAMBLE_DENSITY } from '@/lib/Domain/global-defaults';
 
 // Default settings, which will be updated from storage
 const initialSettings = {
-  scramble_density: 0.7,
+  scramble_density: DEFAULT_SCRAMBLE_DENSITY,
 };
 
 function simpleDebounce(fn: (...args: unknown[]) => void, delay: number) {
