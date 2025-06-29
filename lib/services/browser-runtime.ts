@@ -6,7 +6,7 @@
 import { browser } from '#imports'; // WXT built-ins
 import * as Data from 'effect/Data';
 import * as Effect from 'effect/Effect';
-import type { Message } from '../Domain/message-schema';
+import type { Message } from '../domain/message-schema';
 
 class BrowserRuntimeError extends Data.TaggedClass('BrowserRuntimeError')<{
   cause: unknown

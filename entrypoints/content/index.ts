@@ -1,5 +1,5 @@
 import { browser, defineContentScript } from '#imports'; // WXT built-ins
-import { DEFAULT_SCRAMBLE_DENSITY } from '@/lib/Domain/global-defaults';
+import { DEFAULT_SCRAMBLE_DENSITY } from '@/lib/domain/global-defaults';
 import { applyOverlayToSelection } from './active-selection-scramble';
 
 export default defineContentScript({

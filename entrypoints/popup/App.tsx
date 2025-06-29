@@ -1,6 +1,6 @@
 import { browser, useCallback } from '#imports'; // WXT built-ins
 import { useEffect, useRef, useState } from 'react';
-import { DEFAULT_SCRAMBLE_DENSITY } from '@/lib/Domain/global-defaults';
+import { DEFAULT_SCRAMBLE_DENSITY } from '@/lib/domain/global-defaults';
 
 // Default settings, which will be updated from storage
 const initialSettings = {

@@ -1,6 +1,6 @@
 import { browser, defineBackground } from '#imports'; // WXT built-ins
 import addPermissionToggle from 'webext-permission-toggle';
-import { DEFAULT_SCRAMBLE_DENSITY } from '@/lib/Domain/global-defaults';
+import { DEFAULT_SCRAMBLE_DENSITY } from '@/lib/domain/global-defaults';
 import 'webext-dynamic-content-scripts'; // auto-refresh content-scripts when permissions change
 
 export default defineBackground({
