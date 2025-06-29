@@ -49,6 +49,11 @@ export default antfu({
     // allow for redeclarations to enable type and interface shadowing (useful for schemas)
     'ts/no-redeclare': 'off',
 
+    // allow for things to be called "use" because it's a common effect pattern
+    'react-hooks-extra/no-unnecessary-use-prefix': ['warn', {
+      allow: ['use'],
+    }],
+
     // use the recommended rules from the better-tailwindcss plugin
     ...eslintPluginBetterTailwindcss.configs.recommended.rules,
 

@@ -155,7 +155,6 @@
     "react/no-array-index-key": "warn",
     "react/jsx-no-comment-textnodes": "warn",
 
-    "react/rules-of-hooks": "error",
     "react/style-prop-object": "error",
 
     "react_perf/jsx-no-new-array-as-prop": "warn",
@@ -172,5 +171,13 @@
     "typescript/consistent-indexed-object-style": "error",
     "typescript/consistent-generic-constructors": "error",
     "typescript/prefer-function-type": "error"
-  }
+  },
+  "overrides": [
+    {
+      "files": ["**/*.tsx", "**/*.jsx"],
+      "rules": {
+        "react/rules-of-hooks": "warn"
+      }
+    }
+  ]
 }
