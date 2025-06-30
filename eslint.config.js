@@ -50,9 +50,7 @@ export default antfu({
     'ts/no-redeclare': 'off',
 
     // allow for things to be called "use" because it's a common effect pattern
-    'react-hooks-extra/no-unnecessary-use-prefix': ['warn', {
-      allow: ['use'],
-    }],
+    'react-hooks-extra/no-unnecessary-use-prefix': 'off',
 
     // use the recommended rules from the better-tailwindcss plugin
     ...eslintPluginBetterTailwindcss.configs.recommended.rules,
