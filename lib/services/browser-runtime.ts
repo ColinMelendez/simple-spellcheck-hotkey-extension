@@ -3,10 +3,10 @@
  * the extension browser runtime namespace effectfully.
  */
 
+import type { Message } from '../domain/message-schema';
 import { browser } from '#imports'; // WXT built-ins
 import * as Data from 'effect/Data';
 import * as Effect from 'effect/Effect';
-import type { Message } from '../domain/message-schema';
 
 class BrowserRuntimeError extends Data.TaggedClass('BrowserRuntimeError')<{
   cause: unknown
@@ -21,7 +21,7 @@ export class BrowserRuntime extends Effect.Service<BrowserRuntime>() ('BrowserRu
     const runtime = browser.runtime;
 
     /**
-     * Use the wrapped browser runtime instance for any of it's internal methods, safely wrapped in an effect.
+     * Use the wrapped browser runtime instance for any of it's synchronous internal methods, safely wrapped in an effect.
      * @param f - The function that accepts and uses the runtime instance.
      * @returns - An effect that succeeds with whatever the function returns, or fails with a
      * `BrowserRuntimeError` if any errors are thrown while using the runtime.
