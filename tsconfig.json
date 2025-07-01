@@ -3,12 +3,17 @@
   "compilerOptions": {
     "plugins": [
       {
-        "name": "@effect/language-service"
+        "name": "@effect/language-service",
+        "transform": "@effect/language-service/transform",
+        "namespaceImportPackages": ["effect"],
+        "diagnosticSeverity": {
+          "importFromBarrel": "error"
+        }
       }
     ],
     "target": "es2024",
     "jsx": "preserve",
-    "lib": ["ES2024", "DOM", "DOM.Iterable", "WebWorker"],
+    "lib": ["ES2024", "DOM", "DOM.Iterable", "DOM.AsyncIterable", "WebWorker"],
     "moduleDetection": "force",
     "module": "preserve",
     "moduleResolution": "bundler",

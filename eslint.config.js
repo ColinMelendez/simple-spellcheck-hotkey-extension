@@ -62,7 +62,7 @@ export default antfu({
       group: 'newLine',
     }],
 
-    // force all external variables using in tailwindcss classnames to use the same syntax
+    // force all external variables used in tailwindcss classnames to use the same syntax pattern
     'better-tailwindcss/enforce-consistent-variable-syntax': ['warn', {
       syntax: 'arbitrary',
     }],
