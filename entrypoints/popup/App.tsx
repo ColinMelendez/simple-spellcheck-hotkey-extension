@@ -1,57 +1,16 @@
-import { browser, useCallback } from '#imports'; // WXT built-ins
-import { useEffect, useRef, useState } from 'react';
-import { DEFAULT_SCRAMBLE_DENSITY } from '@/lib/domain/global-defaults';
-
-// Default settings, which will be updated from storage
-const initialSettings = {
-  scramble_density: DEFAULT_SCRAMBLE_DENSITY,
-};
-
-function simpleDebounce(fn: (...args: unknown[]) => void, delay: number) {
-  let timeoutId: NodeJS.Timeout | undefined;
-  return (...args: unknown[]) => {
-    if (timeoutId) {
-      clearTimeout(timeoutId);
-    }
-    timeoutId = setTimeout(() => fn(...args), delay);
-  };
-}
-
-const sendSettings = simpleDebounce((settings) => {
-  void browser.runtime.sendMessage({ type: 'setSettings', settings });
-}, 500);
+import { useCallback } from 'react';
+import { useSettingsStorage } from '@/hooks/use-settings-storage';
+import { ScrambleDensity } from '@/lib/domain/settings-schema';
 
 function App() {
-  const [settings, setSettings] = useState(initialSettings);
-  const scrambleDensity = settings.scramble_density;
-  const isInitialMount = useRef(true);
+  const [settings, updateSettingsStorage] = useSettingsStorage();
 
-  // On popup open, ask the background script for the latest settings
-  useEffect(() => {
-    browser.runtime.sendMessage({ type: 'getSettings' }).then((response) => {
-      // eslint-disable-next-line ts/strict-boolean-expressions, ts/no-unsafe-member-access
-      if (response?.settings) {
-        // eslint-disable-next-line ts/no-unsafe-member-access
-        console.log('settings', response.settings);
-        // eslint-disable-next-line ts/no-unsafe-argument, ts/no-unsafe-member-access
-        setSettings(response.settings);
-      }
-    }).catch((err) => console.error('Could not get settings from background script', err));
-  }, []);
-
-  // Debounce sending settings to the background script
-  useEffect(() => {
-    if (isInitialMount.current) {
-      isInitialMount.current = false;
-      return;
-    }
-
-    sendSettings();
-  }, [settings]);
-
-  const onChangeUpdateSettings = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setSettings({ ...settings, scramble_density: Number.parseFloat(e.target.value) });
-  }, [settings]);
+  const updateSettings = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    updateSettingsStorage({
+      ...settings,
+      scrambleDensity: ScrambleDensity.make(Number.parseFloat(e.target.value)),
+    });
+  }, [settings, updateSettingsStorage]);
 
   return (
     <div className="mx-auto max-w-screen-md p-4 text-center">
@@ -59,7 +18,7 @@ function App() {
       <div className="p-4">
         <label htmlFor="scramble-density" className="mb-2 block text-sm font-medium">
           Scramble Density:
-          <span className="ml-2 font-mono">{scrambleDensity.toFixed(2)}</span>
+          <span className="ml-2 font-mono">{settings.scrambleDensity.toFixed(2)}</span>
         </label>
         <input
           id="scramble-density"
@@ -67,8 +26,8 @@ function App() {
           min="0"
           max="1"
           step="0.01"
-          value={scrambleDensity}
-          onChange={onChangeUpdateSettings}
+          value={settings.scrambleDensity}
+          onChange={updateSettings}
           className={`
             h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200
             dark:bg-gray-700
