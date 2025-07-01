@@ -101,7 +101,7 @@
     "jsdoc/require-property-name": "warn",
     "jsdoc/require-returns-description": "warn",
 
-    "import/consistent-type-specifier-style": "error",
+    // "import/consistent-type-specifier-style": "error",
     "import/first": "error",
     "import/no-duplicates": "error",
     "import/no-mutable-exports": "error",

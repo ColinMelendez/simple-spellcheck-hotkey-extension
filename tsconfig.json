@@ -1,6 +1,16 @@
 {
   "extends": "./.wxt/tsconfig.json",
   "compilerOptions": {
+    "target": "es2024",
+    "jsx": "preserve",
+    "lib": ["ES2024", "DOM", "DOM.Iterable", "DOM.AsyncIterable", "WebWorker"],
+    "moduleDetection": "force",
+    "baseUrl": ".",
+    "module": "preserve",
+    "moduleResolution": "bundler",
+    "paths": {
+      "@/*": ["./*"] // not strictly recommended from wxt, but required for shadcn cli to work
+    },
     "plugins": [
       {
         "name": "@effect/language-service",
@@ -11,12 +21,6 @@
         }
       }
     ],
-    "target": "es2024",
-    "jsx": "preserve",
-    "lib": ["ES2024", "DOM", "DOM.Iterable", "DOM.AsyncIterable", "WebWorker"],
-    "moduleDetection": "force",
-    "module": "preserve",
-    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "allowJs": true,

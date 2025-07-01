@@ -1,3 +1,4 @@
+import path from 'node:path';
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'wxt';
 
@@ -9,6 +10,11 @@ export default defineConfig({
     plugins: [
       tailwindcss(),
     ],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './'), // to work with shadcn cli
+      },
+    },
   }),
   manifest: {
     web_accessible_resources: [],
@@ -32,8 +38,8 @@ export default defineConfig({
         // During development, content scripts are not listed in manifest at
         // all times, causing "webext-dynamic-content-scripts" to throw an error.
         // So we need to add them manually.
-        // each content script should have it's trigger matches and output js file
-        // listed here to work.
+        // each content script should have it's triggers (value of the `matches` key in it's index.ts) and
+        // the output js file it compiles to listed here to work.
         manifest.content_scripts ??= [];
         manifest.content_scripts.push({
           matches: ['*://*.google.com/*'],
