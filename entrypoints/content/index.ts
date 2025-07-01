@@ -1,5 +1,13 @@
-import { browser, defineContentScript } from '#imports'; // WXT built-ins
-import { DEFAULT_SCRAMBLE_DENSITY } from '@/lib/domain/global-defaults';
+import {
+  browser,
+  defineContentScript,
+} from '#imports'; // WXT built-ins
+import * as Schema from 'effect/Schema';
+import {
+  DEFAULT_SETTINGS,
+  SETTINGS_STORAGE_KEY,
+} from '@/lib/domain/global-defaults';
+import { Settings } from '@/lib/domain/settings-schema';
 import { applyOverlayToSelection } from './active-selection-scramble';
 
 export default defineContentScript({
@@ -10,41 +18,44 @@ export default defineContentScript({
    * Permissions must be defined in the manifest or manually added by the user.
    */
   matches: ['*://*.google.com/*'],
-  main() {
+  main: () => {
     console.log('hello from entrypoints/content/index.ts');
 
-    const settings = {
-      scramble_density: DEFAULT_SCRAMBLE_DENSITY, // Default value, will be updated from storage
-    };
+    // default settings value
+    let settings = DEFAULT_SETTINGS;
+
+    // on startup, get the current settings from storage
+    browser.storage.local.get(SETTINGS_STORAGE_KEY)
+      .then((data: Record<string, unknown>) => {
+        try {
+          settings = Schema.decodeUnknownSync(Settings)(data[SETTINGS_STORAGE_KEY]);
+        }
+        catch (error) {
+          console.error('Error decoding settings from storage', error);
+        }
+      })
+      .catch((err) => {
+        console.error('Could not update settings from storage, using default values', err);
+      });
 
     // On every selection change, a new overlay function is created with the *current* settings.
     // This ensures that if the `settings` object is updated, subsequent selections use the new values.
     document.addEventListener('selectionchange', () => {
       requestAnimationFrame(applyOverlayToSelection(settings));
+    }, {
+      passive: true,
     });
 
-    // Request initial settings from the background script
-    browser.runtime.sendMessage({ type: 'getSettings' }).then((response) => {
-      // eslint-disable-next-line ts/strict-boolean-expressions, ts/no-unsafe-member-access
-      if (response?.settings) {
-        // eslint-disable-next-line ts/no-unsafe-member-access
-        console.log('Applying initial settings from background:', response.settings);
-        // eslint-disable-next-line ts/no-unsafe-member-access
-        Object.assign(settings, response.settings);
-      }
-    }).catch((err) => console.error('Could not get settings from background script', err));
-
-    // Listen for settings updates from the background script
-    browser.runtime.onMessage.addListener((message) => {
-      // eslint-disable-next-line ts/strict-boolean-expressions, ts/no-unsafe-member-access
-      if (message.type === 'settingsUpdated' && message.settings) {
-        // eslint-disable-next-line ts/no-unsafe-member-access
-        console.log('Settings updated:', message.settings);
-        // eslint-disable-next-line ts/no-unsafe-member-access
-        Object.assign(settings, message.settings);
+    // when the settings are updated in storage, update the settings locally
+    browser.storage.local.onChanged.addListener((changes) => {
+      if (changes[SETTINGS_STORAGE_KEY]) {
+        try {
+          settings = Schema.decodeUnknownSync(Settings)(changes[SETTINGS_STORAGE_KEY].newValue);
+        }
+        catch (error) {
+          console.error('Error decoding settings from storage', error);
+        }
       }
     });
-
-    // const port = browser.runtime.sendMessage({ name: 'content-script' });
   },
 });

@@ -54,14 +54,14 @@ function clearOverlays() {
  * These overlays visually mask the text without modifying the DOM content.
  * This is a curried function that allows settings to be pre-configured.
  * @param settings - Configuration for the overlay.
- * @param settings.scramble_density - The probability (0-1) of scrambling a character.
+ * @param settings.scrambleDensity - The probability (0-1) of scrambling a character.
  * @returns A function that, when called, applies the overlay to the current selection.
  */
 export function applyOverlayToSelection(
   // configuration for the overlay
   settings: {
     // the chance of a scrambled character being overlaid on each character of the selected text
-    scramble_density: number
+    scrambleDensity: number
   },
 ): () => void {
   return () => {
@@ -98,7 +98,7 @@ export function applyOverlayToSelection(
 
       // Generate random text with the same length as the original text
       const randomText = Array.from(text)
-        .map((char) => getRandomChar(char, settings.scramble_density))
+        .map((char) => getRandomChar(char, settings.scrambleDensity))
         .join('');
 
       overlay.textContent = randomText;
