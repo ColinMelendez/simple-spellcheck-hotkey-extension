@@ -1,17 +1,21 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { SlidingNumber } from '@/components/sliding-number';
+import { Slider } from '@/components/ui/slider';
 import { useSettingsStorage } from '@/hooks/use-settings-storage';
 import { ScrambleDensity } from '@/lib/domain/settings-schema';
 
 function App() {
   const [settings, updateSettingsStorage] = useSettingsStorage();
 
-  const updateSettings = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const updateSettings = useCallback((value: number[]) => {
+    const [scrambleDensity = 0] = value;
     updateSettingsStorage({
       ...settings,
-      scrambleDensity: ScrambleDensity.make(Number.parseFloat(e.target.value)),
+      scrambleDensity: ScrambleDensity.make(scrambleDensity),
     });
   }, [settings, updateSettingsStorage]);
+
+  const sliderValueProp = useMemo(() => [settings.scrambleDensity], [settings.scrambleDensity]);
 
   return (
     <div className="mx-auto flex max-w-screen-md flex-col gap-4 p-4 text-center">
@@ -27,18 +31,13 @@ function App() {
             className="ml-2 text-sm font-medium"
           />
         </div>
-        <input
+        <Slider
           id="scramble-density"
-          type="range"
-          min="0"
-          max="1"
-          step="0.01"
-          value={settings.scrambleDensity}
-          onChange={updateSettings}
-          className={`
-            h-2 w-full cursor-pointer appearance-none rounded-lg bg-gray-200
-            dark:bg-gray-700
-          `}
+          value={sliderValueProp}
+          min={0}
+          max={1}
+          step={0.01}
+          onValueChange={updateSettings}
         />
         <p className={`
           mt-2 text-xs text-gray-500
