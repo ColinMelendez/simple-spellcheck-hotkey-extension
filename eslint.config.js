@@ -52,6 +52,9 @@ export default antfu({
     // allow for things to be called "use" because it's a common effect pattern
     'react-hooks-extra/no-unnecessary-use-prefix': 'off',
 
+    // allow inline type import specifiers
+    'import/consistent-type-specifier-style': 'off',
+
     // use the recommended rules from the better-tailwindcss plugin
     ...eslintPluginBetterTailwindcss.configs.recommended.rules,
 
