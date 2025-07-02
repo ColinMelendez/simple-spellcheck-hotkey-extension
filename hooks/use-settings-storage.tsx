@@ -10,6 +10,7 @@ import { BrowserLocalStorage } from '@/lib/services/browser-local-storage';
 
 /**
  * Update the settings state in storage with a new value
+ * @internal
  * @param updatedSettings - The new settings value to store
  */
 const updateSettingsStorage = (updatedSettings: Settings) => {
@@ -33,6 +34,7 @@ const updateSettingsStorage = (updatedSettings: Settings) => {
 /**
  * A hook to subscribe to and update the state of the extension's stored settings
  * @returns A tuple containing the current settings state and a function to update the settings state in storage
+ * The settings value is reactive to changes made to the stored settings anywhere in the extension.
  */
 export const useSettingsStorage = () => {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);

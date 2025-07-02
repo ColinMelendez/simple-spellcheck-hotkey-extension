@@ -22,7 +22,8 @@
     { "rule": "*-newline", "severity": "off", "fixable": true },
     { "rule": "*quotes", "severity": "off", "fixable": true },
     { "rule": "*semi", "severity": "off", "fixable": true },
-    { "rule": "perfectionist/sort-imports", "severity": "off", "fixable": true }
+    { "rule": "perfectionist/sort-imports", "severity": "off", "fixable": true },
+    { "rule": "perfectionist/sort-named-imports", "severity": "off", "fixable": true }
   ],
 
   // Enable eslint for all supported languages
@@ -64,6 +65,5 @@
   // provide the tailwindcss language server for css files (fixes the unknown @ rule warnings in css files and enables oklch color variables)
   "files.associations": {
     "*.css": "tailwindcss"
-  },
-
+  }
 }
