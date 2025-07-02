@@ -1,7 +1,9 @@
 import { useCallback, useMemo } from 'react';
+import { ModeToggle } from '@/components/mode-toggle';
 import { SlidingNumber } from '@/components/sliding-number';
 import { Slider } from '@/components/ui/slider';
 import { useSettingsStorage } from '@/hooks/use-settings-storage';
+
 import { ScrambleDensity } from '@/lib/domain/settings-schema';
 
 function App() {
@@ -19,6 +21,11 @@ function App() {
 
   return (
     <div className="mx-auto flex max-w-screen-md flex-col gap-4 p-4 text-center">
+      <div className="-mx-4 -mt-4 flex justify-end">
+        <ModeToggle
+          variant="ghost"
+        />
+      </div>
       <h1 className="text-xl leading-tight">Text Scrambler Settings</h1>
       <div className="flex flex-col gap-4">
         <div className="flex flex-row items-center justify-center justify-items-center">
