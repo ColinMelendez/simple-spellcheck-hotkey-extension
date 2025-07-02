@@ -26,8 +26,10 @@
     "clsx": "^2.1.1",
     "effect": "^3.16.8",
     "lucide-react": "^0.525.0",
+    "motion": "^12.22.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "react-use-measure": "^2.1.7",
     "tailwind-merge": "^3.3.1",
     "webext-dynamic-content-scripts": "^10.0.4",
     "webext-permission-toggle": "^6.0.1"

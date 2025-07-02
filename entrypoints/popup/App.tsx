@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { SlidingNumber } from '@/components/sliding-number';
 import { useSettingsStorage } from '@/hooks/use-settings-storage';
 import { ScrambleDensity } from '@/lib/domain/settings-schema';
 
@@ -13,13 +14,19 @@ function App() {
   }, [settings, updateSettingsStorage]);
 
   return (
-    <div className="mx-auto max-w-screen-md p-4 text-center">
+    <div className="mx-auto flex max-w-screen-md flex-col gap-4 p-4 text-center">
       <h1 className="text-xl leading-tight">Text Scrambler Settings</h1>
-      <div className="p-4">
-        <label htmlFor="scramble-density" className="mb-2 block text-sm font-medium">
-          Scramble Density:
-          <span className="ml-2 font-mono">{settings.scrambleDensity.toFixed(2)}</span>
-        </label>
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-row items-center justify-center justify-items-center">
+          <label htmlFor="scramble-density" className="block text-sm font-medium">
+            Scramble Density:
+          </label>
+          <SlidingNumber
+            number={settings.scrambleDensity}
+            decimalPlaces={2}
+            className="ml-2 text-sm font-medium"
+          />
+        </div>
         <input
           id="scramble-density"
           type="range"
@@ -41,13 +48,6 @@ function App() {
           Controls the percentage of characters that are scrambled.
         </p>
       </div>
-      <p className={`
-        text-xs text-gray-500
-        dark:text-gray-400
-      `}
-      >
-        Changes are saved automatically and applied to all tabs.
-      </p>
     </div>
   );
 }
