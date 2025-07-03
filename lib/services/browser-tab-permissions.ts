@@ -80,7 +80,7 @@ export class BrowserTabPermissions extends Effect.Service<BrowserTabPermissions>
       use,
       requestPermissionsByUrl,
       requestRemovePermissionsByUrl,
-      checkTabPermission: checkTabPermissionByUrl,
+      checkTabPermissionByUrl,
       toggleTabPermission,
     } as const;
   }),

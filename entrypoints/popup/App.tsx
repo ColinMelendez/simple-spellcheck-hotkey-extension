@@ -5,9 +5,12 @@ import { Slider } from '@/components/ui/slider';
 import { useSettingsStorage } from '@/hooks/use-settings-storage';
 
 import { ScrambleDensity } from '@/lib/domain/settings-schema';
+import { usePermissions } from '@/hooks/use-permissions';
 
 function App() {
   const [settings, updateSettingsStorage] = useSettingsStorage();
+
+  const [pagePermissionState, togglePermissionState] = usePermissions();
 
   const updateSettings = useCallback((value: number[]) => {
     const [scrambleDensity = 0] = value;

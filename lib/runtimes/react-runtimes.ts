@@ -1,13 +1,18 @@
-import * as Effect from 'effect/Effect';
 import * as Layer from 'effect/Layer';
 import * as ManagedRuntime from 'effect/ManagedRuntime';
 import { BrowserLocalStorage } from '@/lib/services/browser-local-storage';
-
-const memoMap = Effect.runSync(Layer.makeMemoMap);
+import { BrowserTabPermissions } from '../services/browser-tab-permissions';
+import { BrowserTabs } from '../services/browser-tabs';
 
 export const useSettingsStorageRuntime = ManagedRuntime.make(
   Layer.mergeAll(
     BrowserLocalStorage.Default,
   ),
-  memoMap,
+);
+
+export const usePermissionsRuntime = ManagedRuntime.make(
+  Layer.mergeAll(
+    BrowserTabs.Default,
+    BrowserTabPermissions.Default,
+  ),
 );
