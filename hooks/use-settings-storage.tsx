@@ -5,7 +5,7 @@ import * as Schema from 'effect/Schema';
 import { useCallback, useEffect, useState } from 'react';
 import { DEFAULT_SETTINGS, SETTINGS_STORAGE_KEY } from '@/lib/domain/global-defaults';
 import { Settings } from '@/lib/domain/settings-schema';
-import { popupRuntime } from '@/lib/runtimes/react-runtimes';
+import { useSettingsStorageRuntime } from '@/lib/runtimes/react-runtimes';
 import { BrowserLocalStorage } from '@/lib/services/browser-local-storage';
 
 /**
@@ -27,7 +27,7 @@ const updateSettingsStorage = (updatedSettings: Settings) => {
       BrowserLocalStorageError: (error) => Effect.logError(error),
       ParseError: (error) => Effect.logError(error),
     }),
-    popupRuntime.runPromise,
+    useSettingsStorageRuntime.runPromise,
   );
 }
 
@@ -49,7 +49,7 @@ export const useSettingsStorage = () => {
       Effect.catchTags({
         ParseError: (error) => Effect.logError(error),
       }),
-      popupRuntime.runPromise,
+      useSettingsStorageRuntime.runPromise,
     );
   }, []);
 
@@ -65,7 +65,7 @@ export const useSettingsStorage = () => {
         ParseError: (error) => Effect.logError(error),
         BrowserLocalStorageError: (error) => Effect.logError(error),
       }),
-      popupRuntime.runPromise,
+      useSettingsStorageRuntime.runPromise,
     );
 
     browser.storage.local.onChanged.addListener(onLocalStorageSettingsChange);

@@ -3,15 +3,15 @@ import * as Console from 'effect/Console';
 import * as Effect from 'effect/Effect';
 import { backgroundRuntime } from '@/lib/runtimes/background-runtime';
 import { BrowserRuntime } from '@/lib/services/browser-runtime';
-import { PermissionsToggle } from '@/lib/services/permissions-toggle';
+import { PermissionsMenuOption } from '@/lib/services/permissions-menu-option';
 import 'webext-dynamic-content-scripts'; // auto-refresh content-scripts when permissions change
 
 const backgroundEffect = Effect.gen(function* () {
   yield* Console.log('Hello background!', { id: browser.runtime.id });
 
-  // Initialize the permissions toggle feature
-  const permissionsToggle = yield* PermissionsToggle;
-  yield* permissionsToggle.toggle;
+  // Initialize the permissions menu option
+  const permissionsMenuOption = yield* PermissionsMenuOption;
+  yield* permissionsMenuOption.toggle;
 
   const browserRuntime = yield* BrowserRuntime;
   yield* browserRuntime.use((runtime) => {
@@ -28,7 +28,7 @@ const backgroundEffect = Effect.gen(function* () {
 }).pipe(
   Effect.catchTags({
     BrowserRuntimeError: (error) => Effect.logError(error),
-    PermissionsToggleError: (error) => Effect.logError(error),
+    PermissionsMenuOptionError: (error) => Effect.logError(error),
   }),
   Effect.catchAllDefect((defect) => Effect.logError('fatal defect in background script', defect)),
 )

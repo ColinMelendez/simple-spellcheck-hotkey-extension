@@ -5,7 +5,7 @@ import { BrowserLocalStorage } from '@/lib/services/browser-local-storage';
 
 const memoMap = Effect.runSync(Layer.makeMemoMap);
 
-export const popupRuntime = ManagedRuntime.make(
+export const useSettingsStorageRuntime = ManagedRuntime.make(
   Layer.mergeAll(
     BrowserLocalStorage.Default,
   ),
