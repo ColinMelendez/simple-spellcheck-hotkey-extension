@@ -42,7 +42,7 @@ function getRandomChar(char: string, scrambleDensity: number) {
  * Clears all currently active overlay elements from the DOM.
  * @internal
  */
-function clearOverlays() {
+export function clearOverlays() {
   for (const overlay of activeOverlays) {
     overlay.remove();
   }
@@ -58,9 +58,7 @@ function clearOverlays() {
  * @returns A function that, when called, applies the overlay to the current selection.
  */
 export function applyOverlayToSelection(
-  // configuration for the overlay
   settings: {
-    // the chance of a scrambled character being overlaid on each character of the selected text
     scrambleDensity: number
   },
 ): () => void {
@@ -106,4 +104,4 @@ export function applyOverlayToSelection(
       activeOverlays.push(overlay);
     }
   };
-}
+};

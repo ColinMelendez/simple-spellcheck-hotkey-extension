@@ -1,16 +1,13 @@
 import { useCallback, useMemo } from 'react';
-import { Checkbox, type CheckedState } from '@/components/checkbox';
 import { ModeToggle } from '@/components/mode-toggle';
+import { PermissionsToggle } from '@/components/permissions-toggle';
 import { SlidingNumber } from '@/components/sliding-number';
 import { Slider } from '@/components/ui/slider';
-import { usePermissions } from '@/hooks/use-permissions';
 import { useSettingsStorage } from '@/hooks/use-settings-storage';
 import { ScrambleDensity } from '@/lib/domain/settings-schema';
 
 function App() {
   const [settings, updateSettingsStorage] = useSettingsStorage();
-
-  const [pagePermissionState, togglePermissionState, tabUrl] = usePermissions();
 
   const updateSettings = useCallback((value: number[]) => {
     const [scrambleDensity = 0] = value;
@@ -21,15 +18,6 @@ function App() {
   }, [settings, updateSettingsStorage]);
 
   const sliderValueProp = useMemo(() => [settings.scrambleDensity], [settings.scrambleDensity]);
-
-  const setPermissions = useCallback((toggleState: CheckedState) => {
-    if (toggleState === true) {
-      togglePermissionState(true);
-    }
-    else {
-      togglePermissionState(false);
-    }
-  }, [togglePermissionState])
 
   return (
     <div className="mx-auto flex max-w-screen-md flex-col gap-4 p-4 text-center">
@@ -66,19 +54,7 @@ function App() {
           Controls the percentage of characters that are scrambled.
         </p>
       </div>
-      <div className="flex flex-row items-center justify-center justify-items-center gap-2">
-        <Checkbox
-          checked={pagePermissionState}
-          onCheckedChange={setPermissions}
-        />
-        <p className={`
-          text-sm text-gray-500
-          dark:text-gray-400
-        `}
-        >
-          {tabUrl ? `${new URL(tabUrl).hostname}` : ''}
-        </p>
-      </div>
+      <PermissionsToggle />
     </div>
   );
 }

@@ -8,7 +8,9 @@ import {
   SETTINGS_STORAGE_KEY,
 } from '@/lib/domain/global-defaults';
 import { Settings } from '@/lib/domain/settings-schema';
-import { applyOverlayToSelection } from './active-selection-scramble';
+import { applyOverlayToSelection, clearOverlays } from './active-selection-scramble';
+import { Message } from '@/lib/domain/message-schema';
+import * as Option from 'effect/Option';
 
 export default defineContentScript({
   /**
@@ -38,24 +40,41 @@ export default defineContentScript({
         console.error('Could not update settings from storage, using default values', err);
       });
 
-    // On every selection change, a new overlay function is created with the *current* settings.
-    // This ensures that if the `settings` object is updated, subsequent selections use the new values.
-    document.addEventListener('selectionchange', () => {
-      requestAnimationFrame(applyOverlayToSelection(settings));
-    }, {
-      passive: true,
-    });
-
     // when the settings are updated in storage, update the settings locally
     browser.storage.local.onChanged.addListener((changes) => {
       if (changes[SETTINGS_STORAGE_KEY]) {
         try {
           settings = Schema.decodeUnknownSync(Settings)(changes[SETTINGS_STORAGE_KEY].newValue);
+          // reset the overlay with the updated settings
+          applyOverlayToSelection(settings)();
         }
         catch (error) {
           console.error('Error decoding settings from storage', error);
         }
       }
     });
+
+    const controller = new AbortController();
+
+    // On every selection change, a new overlay function is created with the *current* settings.
+    // This ensures that if the `settings` object is updated, subsequent selections use the new values.
+    document.addEventListener('selectionchange', () => {
+      requestAnimationFrame(applyOverlayToSelection(settings));
+    }, {
+      passive: true,
+      signal: controller.signal,
+    });
+
+    // attach a listener to the abort signal itself to clean up the overlays if the scramble effect is disabled.
+    controller.signal.addEventListener('abort', () => {
+      clearOverlays();
+    });
+
+    browser.runtime.onMessage.addListener((message) => {
+      const decodedMessage = Schema.decodeUnknownOption(Message)(message);
+      if (Option.isSome(decodedMessage) && decodedMessage.value.messageCategory === 'disable-scramble') {
+        controller.abort();
+      }
+    })
   },
 });
