@@ -31,7 +31,7 @@ export class BrowserTabs extends Effect.Service<BrowserTabs>()('BrowserTabs', {
      * @returns - The current tab url, or a `GetCurrentTabUrlError` if the tab is undefined or has no URL.
      */
     const currentTabUrl = Effect.gen(function* () {
-      const tab = yield* use(async (browserTabs) => browserTabs.getCurrent());
+      const [tab] = yield* use(async (browserTabs) => browserTabs.query({ active: true, currentWindow: true }));
       if (tab === undefined || tab.url === undefined) {
         return yield* Effect.fail(new GetCurrentTabUrlError({ cause: 'Tab url was undefined' }));
       }
