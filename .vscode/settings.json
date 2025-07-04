@@ -55,6 +55,7 @@
   // working with Effect APIs is significantly easier if you use inlay hints for function parameters
   "typescript.inlayHints.parameterTypes.enabled": true,
   "typescript.inlayHints.parameterNames.enabled": "all",
+  "editor.inlayHints.maximumLength": 0,
 
   // required for working with the Effect Language Server
   "typescript.tsdk": "node_modules/typescript/lib",
