@@ -7,14 +7,12 @@ import { BrowserTabs } from '@/lib/services/browser-tabs';
 
 export const usePermissions = () => {
   const [pagePermissionState, setPagePermissionState] = useState(false);
+  const [tabUrl, setTabUrl] = useState<string>('');
 
-  const togglePermissionState = useCallback(() => {
+  const togglePermissionState = useCallback((targetState: boolean) => {
     void Effect.gen(function* () {
-      const url = yield* BrowserTabs.pipe(
-        Effect.flatMap((tabs) => tabs.currentTabUrl),
-      );
       yield* BrowserTabPermissions.pipe(
-        Effect.flatMap((permissions) => permissions.toggleTabPermission(url)),
+        Effect.flatMap((permissions) => permissions.toggleTabPermission(tabUrl, targetState)),
         Effect.tap((hasPermission) => {
           setPagePermissionState(hasPermission);
         }),
@@ -22,17 +20,16 @@ export const usePermissions = () => {
     }).pipe(
       Effect.catchTags({
         BrowserPermissionsError: (error) => Effect.logError(error),
-        BrowserTabsError: (error) => Effect.logError(error),
-        GetCurrentTabUrlError: (error) => Effect.logError(error),
       }),
       usePermissionsRuntime.runPromise,
     )
-  }, [])
+  }, [tabUrl])
 
   useLayoutEffect(() => {
     void Effect.gen(function* () {
       const url = yield* BrowserTabs.pipe(
         Effect.flatMap((tabs) => tabs.currentTabUrl),
+        Effect.tap((url) => setTabUrl(url)),
       );
       yield* BrowserTabPermissions.pipe(
         Effect.flatMap((permissions) => permissions.checkTabPermissionByUrl(url)),
@@ -53,5 +50,6 @@ export const usePermissions = () => {
   return [
     pagePermissionState,
     togglePermissionState,
+    tabUrl,
   ] as const;
 }
