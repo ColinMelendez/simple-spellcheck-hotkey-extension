@@ -30,6 +30,9 @@ export class BrowserTabPermissions extends Effect.Service<BrowserTabPermissions>
      * @returns Whether the permissions were granted
      */
     const requestPermissionsByUrl = (url: string) => Effect.gen(function* () {
+      if (url === '') {
+        return false;
+      }
       const permissionData = { origins: [`${new URL(url).origin}/*`] };
       yield* Effect.logDebug('Requesting permissions:', ...permissionData.origins);
       return yield* use(async (browserPermissions) => browserPermissions.request(permissionData));
@@ -41,6 +44,9 @@ export class BrowserTabPermissions extends Effect.Service<BrowserTabPermissions>
      * @returns Whether the permissions were removed
      */
     const requestRemovePermissionsByUrl = (url: string) => Effect.gen(function* () {
+      if (url === '') {
+        return false;
+      }
       const { origins = [] } = yield* use(async (browserPermissions) => browserPermissions.getAll());
       const matchingPatterns = findMatchingPatterns(url, ...origins);
       yield* Effect.logDebug('Removing permissions:', ...matchingPatterns);
@@ -65,13 +71,13 @@ export class BrowserTabPermissions extends Effect.Service<BrowserTabPermissions>
      * @param url - The URL of the tab to toggle permissions for
      * @returns Whether the permissions exist after the toggle
      */
-    const toggleTabPermission = (url: string) => Effect.gen(function* () {
-      const isPermitted = yield* checkTabPermissionByUrl(url)
-      if (isPermitted) {
-        yield* requestRemovePermissionsByUrl(url)
+    const toggleTabPermission = (url: string, targetState: boolean) => Effect.gen(function* () {
+      // const isPermitted = yield* checkTabPermissionByUrl(url)
+      if (targetState) {
+        yield* requestPermissionsByUrl(url);
       }
       else {
-        yield* requestPermissionsByUrl(url)
+        yield* requestRemovePermissionsByUrl(url);
       }
       return yield* checkTabPermissionByUrl(url);
     });
