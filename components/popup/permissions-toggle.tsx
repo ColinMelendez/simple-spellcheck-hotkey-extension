@@ -4,7 +4,7 @@ import { browser } from 'wxt/browser';
 import { usePermissions } from '@/hooks/use-permissions';
 import { permissionsToggleRuntime } from '@/lib/runtimes/react-runtimes';
 import { BrowserTabs } from '@/lib/services/browser-tabs';
-import { Checkbox, type CheckedState } from './checkbox';
+import { Checkbox, type CheckedState } from '../ui/checkbox';
 
 const disableScrambleScript = (url: string) => {
   void Effect.gen(function* () {
