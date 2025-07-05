@@ -4,15 +4,13 @@
  */
 
 import * as Schema from 'effect/Schema';
-import { Settings } from './settings-schema';
 
 /**
  * Schema for the categories of messages that can be sent between the extension and the content script.
  * Intended for routing messages to the correct handlers.
  */
 export const MessageCategory = Schema.Literal(
-  'SettingsRequest',
-  'SettingsBroadcast',
+  'disable-scramble',
 );
 
 export type MessageCategory = typeof MessageCategory.Type;
@@ -22,7 +20,7 @@ export type MessageCategory = typeof MessageCategory.Type;
  */
 export const Message = Schema.Struct({
   messageCategory: MessageCategory,
-  messagePayload: Settings,
+  payload: Schema.optional(Schema.Unknown),
 });
 
 export type Message = typeof Message.Type;
