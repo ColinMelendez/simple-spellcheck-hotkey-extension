@@ -10,28 +10,32 @@ const backgroundEffect = Effect.gen(function* () {
   yield* Console.log('Hello background!', { id: browser.runtime.id });
 
   // Initialize the permissions menu option
-  const permissionsMenuOption = yield* PermissionsMenuOption;
-  yield* permissionsMenuOption.toggle;
+  yield* Effect.flatMap(
+    PermissionsMenuOption,
+    (self) => self.toggle,
+  )
 
-  const browserRuntime = yield* BrowserRuntime;
-  yield* browserRuntime.use((runtime) => {
-    // Open the welcome page when the extension is first installed
-    runtime.onInstalled.addListener((details) => {
-      console.log('onInstalled', details);
-      if (details.reason === 'install') {
-        void browser.tabs.create({
-          url: browser.runtime.getURL('/welcome-page.html'),
-        });
-      }
-    });
-  })
+  yield* Effect.flatMap(
+    BrowserRuntime,
+    (self) => self.use((runtime) => {
+      // Open the welcome page when the extension is first installed
+      runtime.onInstalled.addListener((details) => {
+        console.debug('onInstalled', details);
+        if (details.reason === 'install') {
+          void browser.tabs.create({
+            url: browser.runtime.getURL('/welcome-page.html'),
+          });
+        }
+      });
+    }),
+  )
 }).pipe(
   Effect.catchTags({
     BrowserRuntimeError: (error) => Effect.logError(error),
     PermissionsMenuOptionError: (error) => Effect.logError(error),
   }),
   Effect.catchAllDefect((defect) => Effect.logError('fatal defect in background script', defect)),
-)
+);
 
 export default defineBackground({
   type: 'module',
