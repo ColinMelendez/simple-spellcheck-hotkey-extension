@@ -1,9 +1,9 @@
+import * as Effect from 'effect/Effect';
 import * as Layer from 'effect/Layer';
 import * as ManagedRuntime from 'effect/ManagedRuntime';
 import { BrowserLocalStorage } from '@/lib/services/browser-local-storage';
 import { BrowserTabPermissions } from '../services/browser-tab-permissions';
 import { BrowserTabs } from '../services/browser-tabs';
-import * as Effect from 'effect/Effect';
 
 const memoMap = Effect.runSync(Layer.makeMemoMap);
 

@@ -2,15 +2,15 @@ import {
   browser,
   defineContentScript,
 } from '#imports'; // WXT built-ins
+import * as Option from 'effect/Option';
 import * as Schema from 'effect/Schema';
 import {
   DEFAULT_SETTINGS,
   SETTINGS_STORAGE_KEY,
 } from '@/lib/domain/global-defaults';
+import { Message } from '@/lib/domain/message-schema';
 import { Settings } from '@/lib/domain/settings-schema';
 import { applyOverlayToSelection, clearOverlays } from './active-selection-scramble';
-import { Message } from '@/lib/domain/message-schema';
-import * as Option from 'effect/Option';
 
 export default defineContentScript({
   /**
