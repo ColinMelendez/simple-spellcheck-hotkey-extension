@@ -1,16 +1,16 @@
+import * as Effect from 'effect/Effect';
 import { useCallback } from 'react';
 import { browser } from 'wxt/browser';
 import { usePermissions } from '@/hooks/use-permissions';
-import { Checkbox, type CheckedState } from './checkbox';
-import * as Effect from "effect/Effect";
-import { BrowserTabs } from '@/lib/services/browser-tabs';
 import { permissionsToggleRuntime } from '@/lib/runtimes/react-runtimes';
+import { BrowserTabs } from '@/lib/services/browser-tabs';
+import { Checkbox, type CheckedState } from './checkbox';
 
 const disableScrambleScript = (url: string) => {
-  Effect.gen(function*(){
+  void Effect.gen(function* () {
     const tabsService = yield* BrowserTabs;
     yield* tabsService.use(async (browserTabs) => {
-      browserTabs.query({ url: `${new URL(url).origin}/*` }).then((tabs) => {
+      void browserTabs.query({ url: `${new URL(url).origin}/*` }).then((tabs) => {
         for (const tab of tabs) {
           if (tab.id !== undefined) {
             void browser.tabs.sendMessage(tab.id, {
