@@ -1,0 +1,8 @@
+---
+description:
+globs:
+alwaysApply: true
+---
+# General Guidelines
+
+- Never use `as` to cast types. Always find a formally sound way to resolve type conflicts. The one exception is casting types to `unknown`, which can be useful to eliminate 'any' types when `unknown` is more semantically appropriate.
