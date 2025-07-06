@@ -10,7 +10,7 @@ import {
 } from '@/lib/domain/global-defaults';
 import { Message } from '@/lib/domain/message-schema';
 import { Settings } from '@/lib/domain/settings-schema';
-import { applyOverlayToSelection, clearOverlays } from './active-selection-scramble';
+import { applyOverlayToSelection, clearOverlays } from '@/lib/utils/active-selection-scramble';
 
 export default defineContentScript({
   /**
