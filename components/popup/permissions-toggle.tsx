@@ -71,7 +71,7 @@ export const PermissionsToggle = () => {
               <CircleQuestionMarkIcon className="size-4 text-accent" />
             </TooltipTrigger>
             <TooltipContent className="max-w-2xs border-1 border-background text-center">
-              <p>The browser blocks extensions from running on some types of pages, like those originating from opened files, other extensions, or internal features of the browser.</p>
+              <p>The browser blocks extensions from running on some types of pages, like those originating from open files, extensions, or internal features of the browser.</p>
             </TooltipContent>
           </Tooltip>
         </div>
