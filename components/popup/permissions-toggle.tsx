@@ -44,17 +44,22 @@ export const PermissionsToggle = () => {
   }, [togglePermissionState, tabUrl])
 
   return (
-    <div className="flex flex-row items-center justify-center justify-items-center gap-2">
+    <div>
       {isScriptable && (
-        <>
-          <Checkbox
-            checked={pagePermissionState}
-            onCheckedChange={setPermissions}
-          />
-          <p className="text-sm text-primary">
-            {tabUrl ? `${new URL(tabUrl).hostname}` : ''}
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-row items-center gap-2">
+            <Checkbox
+              checked={pagePermissionState}
+              onCheckedChange={setPermissions}
+            />
+            <p className="text-sm font-medium text-primary">
+              {tabUrl ? `${new URL(tabUrl).hostname}` : ''}
+            </p>
+          </div>
+          <p className="text-xs text-muted-foreground">
+            Enable/disable text scrambling for this site
           </p>
-        </>
+        </div>
       )}
       {!isScriptable && (
         <div className="flex flex-row items-center gap-2 rounded-md bg-destructive px-2 text-sm text-accent">

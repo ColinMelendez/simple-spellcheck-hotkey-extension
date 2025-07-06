@@ -42,11 +42,7 @@ export const ScrambleSetting = () => {
         step={0.01}
         onValueChange={updateSettingsFromSlider}
       />
-      <p className={`
-        mt-2 text-xs text-gray-500
-        dark:text-gray-400
-      `}
-      >
+      <p className="text-xs text-muted-foreground">
         Controls the percentage of characters that are scrambled.
       </p>
     </div>
