@@ -4,6 +4,27 @@ import * as Effect from 'effect/Effect';
 import { findMatchingPatterns } from 'webext-patterns';
 import { BrowserTabs } from './browser-tabs';
 
+// https://source.chromium.org/chromium/chromium/src/+/main:extensions/common/extension_urls.cc;drc=6b42116fe3b3d93a77750bdcc07948e98a728405;l=29
+// https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_scripts
+const unscriptableOrigins = new Set([
+  'chrome.google.com',
+  'chromewebstore.google.com',
+  'accounts-static.cdn.mozilla.net',
+  'accounts.firefox.com',
+  'addons.cdn.mozilla.net',
+  'addons.mozilla.org',
+  'api.accounts.firefox.com',
+  'content.cdn.mozilla.net',
+  'discovery.addons.mozilla.org',
+  'input.mozilla.org',
+  'install.mozilla.org',
+  'oauth.accounts.firefox.com',
+  'profile.accounts.firefox.com',
+  'support.mozilla.org',
+  'sync.services.mozilla.com',
+  'testpilot.firefox.com',
+]);
+
 class BrowserPermissionsError extends Data.TaggedError('BrowserPermissionsError')<{
   cause: unknown
 }> {}
@@ -25,12 +46,26 @@ export class BrowserTabPermissions extends Effect.Service<BrowserTabPermissions>
       });
 
     /**
+     * Checks if the specified url is scriptable
+     * @param url - The url string to check
+     * @returns a boolean indicating whether the url supports script permissions
+     */
+    const isScriptableByUrl = (url: string) => {
+      if (url === '') {
+        return false;
+      }
+      const testUrl = new URL(url);
+      return (testUrl.protocol).startsWith('http') && !unscriptableOrigins.has(testUrl.hostname);
+    }
+
+    /**
      * Requests script permissions for the specified origins
      * @param url - The url string of the tab to request permissions for
      * @returns Whether the permissions were granted
      */
     const requestPermissionsByUrl = (url: string) => Effect.gen(function* () {
-      if (url === '') {
+      console.log('requestPermissionsByUrl', url);
+      if (!isScriptableByUrl(url)) {
         return false;
       }
       const permissionData = { origins: [`${new URL(url).origin}/*`] };
@@ -84,6 +119,7 @@ export class BrowserTabPermissions extends Effect.Service<BrowserTabPermissions>
 
     return {
       use,
+      isScriptableByUrl,
       requestPermissionsByUrl,
       requestRemovePermissionsByUrl,
       checkTabPermissionByUrl,

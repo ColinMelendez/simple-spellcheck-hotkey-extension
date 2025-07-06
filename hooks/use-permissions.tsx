@@ -8,11 +8,12 @@ import { BrowserTabs } from '@/lib/services/browser-tabs';
 export const usePermissions = () => {
   const [pagePermissionState, setPagePermissionState] = useState(false);
   const [tabUrl, setTabUrl] = useState<string>('');
+  const [isScriptable, setIsScriptable] = useState(true);
 
   const togglePermissionState = useCallback((targetState: boolean) => {
     void Effect.gen(function* () {
       yield* BrowserTabPermissions.pipe(
-        Effect.flatMap((permissions) => permissions.toggleTabPermission(tabUrl, targetState)),
+        Effect.flatMap((self) => self.toggleTabPermission(tabUrl, targetState)),
         Effect.tap((hasPermission) => {
           setPagePermissionState(hasPermission);
         }),
@@ -28,11 +29,12 @@ export const usePermissions = () => {
   useLayoutEffect(() => {
     void Effect.gen(function* () {
       const url = yield* BrowserTabs.pipe(
-        Effect.flatMap((tabs) => tabs.currentTabUrl),
+        Effect.flatMap((self) => self.currentTabUrl),
         Effect.tap((url) => setTabUrl(url)),
       );
       yield* BrowserTabPermissions.pipe(
-        Effect.flatMap((permissions) => permissions.checkTabPermissionByUrl(url)),
+        Effect.tap((self) => setIsScriptable(self.isScriptableByUrl(url))),
+        Effect.flatMap((self) => self.checkTabPermissionByUrl(url)),
         Effect.tap((hasPermission) => {
           setPagePermissionState(hasPermission);
         }),
@@ -51,5 +53,6 @@ export const usePermissions = () => {
     pagePermissionState,
     togglePermissionState,
     tabUrl,
+    isScriptable,
   ] as const;
 }

@@ -25,6 +25,7 @@ export const usePermissionsRuntime = ManagedRuntime.make(
 export const permissionsToggleRuntime = ManagedRuntime.make(
   Layer.mergeAll(
     BrowserTabs.Default,
+    BrowserTabPermissions.Default,
   ),
   memoMap,
 );
