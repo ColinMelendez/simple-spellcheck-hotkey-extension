@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { cn } from '@/utils/cn';
+import { cn } from '@/lib/utils/cn';
 import { SlidingNumber, type SlidingNumberProps } from './sliding-number';
 
 interface SlidingNumberInputProps extends Omit<SlidingNumberProps, 'number' | 'onChange'> {

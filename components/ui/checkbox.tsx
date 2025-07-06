@@ -4,7 +4,7 @@ import { type HTMLMotionProps, motion } from 'motion/react';
 import { Checkbox as CheckboxPrimitive } from 'radix-ui';
 import * as React from 'react';
 
-import { cn } from '@/utils/cn';
+import { cn } from '@/lib/utils/cn';
 
 const whileTapStyle = { scale: 0.95 } as const;
 const whileHoverStyle = { scale: 1.05 } as const;
