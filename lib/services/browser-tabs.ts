@@ -1,6 +1,6 @@
-import { browser } from '#imports';
 import * as Data from 'effect/Data';
 import * as Effect from 'effect/Effect';
+import { browser } from 'wxt/browser';
 
 class BrowserTabsError extends Data.TaggedClass('BrowserTabsError')<{
   cause: unknown

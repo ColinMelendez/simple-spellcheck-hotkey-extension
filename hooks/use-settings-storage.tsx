@@ -1,8 +1,7 @@
-import type { Browser } from '#imports';
-import { browser } from '#imports';
 import * as Effect from 'effect/Effect';
 import * as Schema from 'effect/Schema';
 import { useCallback, useEffect, useState } from 'react';
+import { browser, type Browser } from 'wxt/browser';
 import { DEFAULT_SETTINGS, SETTINGS_STORAGE_KEY } from '@/lib/domain/global-defaults';
 import { Settings } from '@/lib/domain/settings-schema';
 import { useSettingsStorageRuntime } from '@/lib/runtimes/react-runtimes';

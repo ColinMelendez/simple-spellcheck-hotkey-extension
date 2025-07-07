@@ -1,6 +1,7 @@
-import { browser, defineBackground } from '#imports'; // WXT built-ins
 import * as Console from 'effect/Console';
 import * as Effect from 'effect/Effect';
+import { browser } from 'wxt/browser';
+import { defineBackground } from 'wxt/utils/define-background';
 import { backgroundRuntime } from '@/lib/runtimes/background-runtime';
 import { BrowserRuntime } from '@/lib/services/browser-runtime';
 import { PermissionsMenuOption } from '@/lib/services/permissions-menu-option';

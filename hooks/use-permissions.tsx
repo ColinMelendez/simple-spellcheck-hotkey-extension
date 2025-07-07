@@ -1,6 +1,5 @@
-import { useCallback } from '#imports';
 import * as Effect from 'effect/Effect';
-import { useLayoutEffect, useState } from 'react';
+import { useCallback, useLayoutEffect, useState } from 'react';
 import { usePermissionsRuntime } from '@/lib/runtimes/react-runtimes';
 import { BrowserTabPermissions } from '@/lib/services/browser-tab-permissions';
 import { BrowserTabs } from '@/lib/services/browser-tabs';

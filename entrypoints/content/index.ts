@@ -1,9 +1,7 @@
-import {
-  browser,
-  defineContentScript,
-} from '#imports'; // WXT built-ins
 import * as Option from 'effect/Option';
 import * as Schema from 'effect/Schema';
+import { browser } from 'wxt/browser';
+import { defineContentScript } from 'wxt/utils/define-content-script';
 import {
   DEFAULT_SETTINGS,
   SETTINGS_STORAGE_KEY,

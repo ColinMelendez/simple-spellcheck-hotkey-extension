@@ -1,7 +1,7 @@
-import { browser } from '#imports';
 import * as Data from 'effect/Data';
 import * as Effect from 'effect/Effect';
 import { findMatchingPatterns } from 'webext-patterns';
+import { browser } from 'wxt/browser';
 import { BrowserTabs } from './browser-tabs';
 
 // https://source.chromium.org/chromium/chromium/src/+/main:extensions/common/extension_urls.cc;drc=6b42116fe3b3d93a77750bdcc07948e98a728405;l=29
