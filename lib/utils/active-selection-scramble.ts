@@ -92,6 +92,21 @@ function applyRectangleBasedOverlay(range: Range, text: string, scrambleDensity:
   if (rects.length === 0)
     return;
 
+  // Get the actual font properties from the selection
+  const startContainer = range.startContainer;
+  const startElement = startContainer.nodeType === Node.TEXT_NODE
+    ? startContainer.parentElement
+    : startContainer as Element;
+
+  const computedStyle = startElement ? window.getComputedStyle(startElement) : undefined;
+
+  // Extract font properties for accurate character width calculation
+  const fontFamily = computedStyle !== undefined ? computedStyle.fontFamily : 'inherit';
+  const fontSize = computedStyle !== undefined ? computedStyle.fontSize : 'inherit';
+  const fontWeight = computedStyle !== undefined ? computedStyle.fontWeight : 'inherit';
+  const fontStyle = computedStyle !== undefined ? computedStyle.fontStyle : 'inherit';
+  const letterSpacing = computedStyle !== undefined ? computedStyle.letterSpacing : 'inherit';
+
   // First, generate a scrambled version of the entire text with proper distribution
   const scrambledChars = Array.from(text).map((char) => {
     const scrambledChar = getRandomChar(char, scrambleDensity);
@@ -102,39 +117,80 @@ function applyRectangleBasedOverlay(range: Range, text: string, scrambleDensity:
     };
   });
 
-  // Calculate approximate characters per rectangle based on width
+  // Calculate total width to ensure we distribute all characters
   const totalWidth = Array.from(rects).reduce((sum, rect) => sum + rect.width, 0);
-  const avgCharWidth = totalWidth / text.length;
+  const totalChars = text.length;
 
+  // Calculate approximate characters per rectangle based on actual font metrics
   let textIndex = 0;
-  for (const rect of rects) {
-    const charsInRect = Math.round(rect.width / avgCharWidth);
+  for (let i = 0; i < rects.length; i++) {
+    const rect = rects[i];
+    if (!rect)
+      continue;
+
+    // Calculate how many characters should go in this rectangle
+    let charsInRect: number;
+    if (i === rects.length - 1) {
+      // Last rectangle gets all remaining characters
+      charsInRect = totalChars - textIndex;
+    }
+    else {
+      // Calculate proportional characters based on rectangle width
+      const rectProportion = rect.width / totalWidth;
+      charsInRect = Math.round(totalChars * rectProportion);
+    }
+
     const rectChars = scrambledChars.slice(textIndex, textIndex + charsInRect);
 
     if (rectChars.length > 0) {
+      // Calculate a dynamic offset based on font size for better alignment
+      const fontSizeValue = Number.parseFloat(fontSize) || 16; // Default to 16 if parsing fails
+      const baselineOffset = fontSizeValue * 0.15; // ~15% of font size for baseline adjustment
+
       const overlay = document.createElement('div');
       overlay.style.position = 'absolute';
       overlay.style.left = `${rect.left + window.scrollX}px`;
-      overlay.style.top = `${rect.top + window.scrollY}px`;
+      overlay.style.top = `${rect.top + window.scrollY - baselineOffset}px`;
       overlay.style.width = `${rect.width}px`;
       overlay.style.height = `${rect.height}px`;
       overlay.style.pointerEvents = 'none';
       overlay.style.userSelect = 'none';
       overlay.style.background = 'transparent';
       overlay.style.color = 'inherit';
-      overlay.style.font = 'inherit';
-      overlay.style.fontSize = 'inherit';
-      overlay.style.lineHeight = 'inherit';
+
+      // Apply the actual font properties from the selected text
+      overlay.style.fontFamily = fontFamily;
+      overlay.style.fontSize = fontSize;
+      overlay.style.fontWeight = fontWeight;
+      overlay.style.fontStyle = fontStyle;
+      overlay.style.letterSpacing = letterSpacing;
+      overlay.style.lineHeight = computedStyle !== undefined ? computedStyle.lineHeight : 'normal';
+
       overlay.style.whiteSpace = 'pre';
       overlay.style.overflow = 'hidden';
       overlay.style.zIndex = '9999';
 
+      // Force text to align at the very top of the container
+      overlay.style.margin = '0';
+      overlay.style.padding = '0';
+      overlay.style.display = 'block';
+      overlay.style.verticalAlign = 'top';
+      overlay.style.textAlign = 'left';
+      overlay.style.border = '0';
+      overlay.style.outline = '0';
+
       // Create individual spans for each character to control transparency
       rectChars.forEach(({ original, scrambled, shouldScramble }) => {
         const span = document.createElement('span');
+
+        // Reset any default styling that might affect positioning
+        span.style.margin = '0';
+        span.style.padding = '0';
+        span.style.verticalAlign = 'baseline';
+        span.style.lineHeight = 'inherit';
+
         if (shouldScramble) {
-          // oxlint-disable-next-line no-null explanation: the span property specifically accepts null, not undefined
-          span.textContent = scrambled ?? null;
+          span.textContent = scrambled !== undefined ? scrambled : '';
           span.style.color = 'inherit';
         }
         else {
