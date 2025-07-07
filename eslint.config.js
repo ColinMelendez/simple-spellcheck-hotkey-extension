@@ -59,7 +59,7 @@ export default antfu({
     ...eslintPluginBetterTailwindcss.configs.recommended.rules,
 
     // break tailwindcss classnames into multiple lines when they have different group prefixes
-    'better-tailwindcss/multiline': ['warn', {
+    'better-tailwindcss/enforce-consistent-line-wrapping': ['warn', {
       printWidth: 200,
       classesPerLine: 0,
       group: 'newLine',
