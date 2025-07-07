@@ -27,8 +27,8 @@ const checkmarkStrokeAnimationVariants = {
 
 type CheckedState = CheckboxPrimitive.CheckedState;
 
-type CheckboxProps = React.ComponentProps<typeof CheckboxPrimitive.Root> &
-  HTMLMotionProps<'button'>;
+type CheckboxProps = React.ComponentProps<typeof CheckboxPrimitive.Root>
+  & HTMLMotionProps<'button'>;
 
 const Checkbox = ({
   className,
