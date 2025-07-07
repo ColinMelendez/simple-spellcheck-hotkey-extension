@@ -1,0 +1,215 @@
+---
+description: This rule describes how to use Vitest with Effect and WXT in this project.
+globs:
+alwaysApply: false
+---
+# Vitest
+
+This project is built with WXT and Effect, and uses Vitest for testing. As these libraries have certain specific needs anad perculiarities, they supply integration libraries and plugins to make using them with Vitrest easier. The information below is mostly taken from their documentation, and gives a sufficient overview of how to use them to begin writing tests.
+
+## WXT
+
+WXT provides a plugin for vitest that does several things to enable testing for browser extensions:
+
+- Polyfills the extension API, browser, with an in-memory implementation using @webext-core/fake-browser.
+- Adds all vite config or plugins in wxt.config.ts.
+- Configures auto-imports (if enabled).
+- Applies internal WXT vite plugins for things like bundling remote code.
+- Sets up global variables provided by WXT (import.meta.env.BROWSE, import.meta.env.MANIFEST_VERSION, import.meta.env.IS_CHROME, etc).
+- Configures aliases (@/\*, @@/\*, etc) so imports can be resolved.
+
+### Example Tests
+
+This example demonstrates that you don't have to mock browser.storage (used by wxt/utils/storage) in tests - @webext-core/fake-browser implements storage in-memory so it behaves like it would in a real extension!
+
+```ts
+import { describe, it, expect } from 'vitest';
+import { fakeBrowser } from 'wxt/testing';
+
+const accountStorage = storage.defineItem<Account>('local:account');
+
+async function isLoggedIn(): Promise<Account> {
+  const value = await accountStorage.getValue();
+  return value != null;
+}
+
+describe('isLoggedIn', () => {
+  beforeEach(() => {
+    // See https://webext-core.aklinker1.io/fake-browser/reseting-state
+    fakeBrowser.reset();
+  });
+
+  it('should return true when the account exists in storage', async () => {
+    const account: Account = {
+      username: '...',
+      preferences: {
+        // ...
+      },
+    };
+    await accountStorage.setValue(account);
+
+    expect(await isLoggedIn()).toBe(true);
+  });
+
+  it('should return false when the account does not exist in storage', async () => {
+    await accountStorage.deleteValue();
+
+    expect(await isLoggedIn()).toBe(false);
+  });
+});
+```
+
+## Effect
+
+Effect provides it's own vitest wrapper package, effect/vitest, which simplifies running tests for Effect-based code with Vitest.
+
+### overview
+
+The main entry point is the following import:
+
+```ts
+import { it } from "@effect/vitest"
+```
+
+This import enhances the standard `it` function from `vitest` with several powerful features, including:
+
+| Feature         | Description                                                                                            |
+| --------------- | ------------------------------------------------------------------------------------------------------ |
+| `it.effect`     | Automatically injects a `TestContext` (e.g., `TestClock`) when running a test.                         |
+| `it.live`       | Runs the test with the live Effect environment.                                                        |
+| `it.scoped`     | Allows running an Effect program that requires a `Scope`.                                              |
+| `it.scopedLive` | Combines the features of `scoped` and `live`, using a live Effect environment that requires a `Scope`. |
+| `it.flakyTest`  | Facilitates the execution of tests that might occasionally fail.                                       |
+
+### Writing Tests with `it.effect`
+
+Here's how to use `it.effect` to write your tests:
+
+**Syntax**
+
+```ts
+import { it } from "@effect/vitest"
+
+it.effect("test name", () => EffectContainingAssertions, timeout: number | TestOptions = 5_000)
+```
+
+`it.effect` automatically provides a `TestContext`, allowing access to services like [`TestClock`](mdc:#using-the-testclock).
+
+#### Testing Successful Operations
+
+To write a test, place your assertions directly within the main effect. This ensures that your assertions are evaluated as part of the test's execution.
+
+**Example** (Testing a Successful Operation)
+
+In the following example, we test a function that divides two numbers, but fails if the divisor is zero. The goal is to check that the function returns the correct result when given valid input.
+
+```ts
+import { it, expect } from "@effect/vitest"
+import { Effect } from "effect"
+
+// A simple divide function that returns an Effect, failing when dividing by zero
+function divide(a: number, b: number) {
+  if (b === 0) return Effect.fail("Cannot divide by zero")
+  return Effect.succeed(a / b)
+}
+
+// Testing a successful division
+it.effect("test success", () =>
+  Effect.gen(function* () {
+    const result = yield* divide(4, 2) // Expect 4 divided by 2 to succeed
+    expect(result).toBe(2) // Assert that the result is 2
+  })
+)
+```
+
+#### Testing Successes and Failures as `Exit`
+
+When you need to handle both success and failure cases in a test, you can use `Effect.exit` to capture the outcome as an `Exit` object. This allows you to verify both successful and failed results within the same test structure.
+
+**Example** (Testing Success and Failure with `Exit`)
+
+```ts
+import { it, expect } from "@effect/vitest"
+import { Effect, Exit } from "effect"
+
+// A function that divides two numbers and returns an Effect.
+// It fails if the divisor is zero.
+function divide(a: number, b: number) {
+  if (b === 0) return Effect.fail("Cannot divide by zero")
+  return Effect.succeed(a / b)
+}
+
+// Test case for a successful division, using `Effect.exit` to capture the result
+it.effect("test success as Exit", () =>
+  Effect.gen(function* () {
+    const result = yield* Effect.exit(divide(4, 2)) // Capture the result as an Exit
+    expect(result).toStrictEqual(Exit.succeed(2)) // Expect success with the value 2
+  })
+)
+
+// Test case for a failure (division by zero), using `Effect.exit`
+it.effect("test failure as Exit", () =>
+  Effect.gen(function* () {
+    const result = yield* Effect.exit(divide(4, 0)) // Capture the result as an Exit
+    expect(result).toStrictEqual(Exit.fail("Cannot divide by zero")) // Expect failure with the correct message
+  })
+)
+```
+
+#### Expecting Tests to Fail
+
+When adding new failing tests, you might not be able to fix them right away. Instead of skipping them, you may want to assert it fails, so that when you fix them, you'll know and can re-enable them before it regresses.
+
+**Example** (Asserting one test fails)
+
+```ts
+import { it } from "@effect/vitest"
+import { Effect, Exit } from "effect"
+
+function divide(a: number, b: number): number {
+  if (b === 0) return Effect.fail("Cannot divide by zero")
+  return Effect.succeed(a / b)
+}
+
+// Temporarily assert that the test for dividing by zero fails.
+it.effect.fails("dividing by zero special cases", ({ expect }) =>
+  Effect.gen(function* () {
+    const result = yield* Effect.exit(divide(4, 0))
+    expect(result).toStrictEqual(0)
+  })
+)
+```
+
+#### Logging
+
+By default, `it.effect` suppresses log output, which can be useful for keeping test results clean. However, if you want to enable logging during tests, you can use `it.live` or provide a custom logger to control the output.
+
+**Example** (Controlling Logging in Tests)
+
+```ts
+import { it } from "@effect/vitest"
+import { Effect, Logger } from "effect"
+
+// This test won't display the log message, as logging is suppressed by default in `it.effect`
+it.effect("does not display a log", () =>
+  Effect.gen(function* () {
+    yield* Effect.log("it.effect") // Log won't be shown
+  })
+)
+
+// This test will display the log because a custom logger is provided
+it.effect("providing a logger displays a log", () =>
+  Effect.gen(function* () {
+    yield* Effect.log("it.effect with custom logger") // Log will be displayed
+  }).pipe(
+    Effect.provide(Logger.pretty) // Providing a pretty logger for log output
+  )
+)
+
+// This test runs using `it.live`, which enables logging by default
+it.live("it.live displays a log", () =>
+  Effect.gen(function* () {
+    yield* Effect.log("it.live") // Log will be displayed
+  })
+)
+```
