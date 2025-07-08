@@ -175,6 +175,13 @@
     "typescript/consistent-generic-constructors": "error",
     "typescript/prefer-function-type": "error"
   },
+  "settings": {
+    "jsdoc": {
+      "tagNamePreference": {
+        "vitest-environment": "vitest-environment" // this is a special comment directive that enables per-file environment specifications for vitest tests
+      }
+    }
+  },
   "overrides": [
     {
       // Scope some react-specific rules to only lint in jsx/tsx files

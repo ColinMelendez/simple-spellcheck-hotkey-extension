@@ -160,11 +160,13 @@ describe('settingsSchema', () => {
     });
 
     it('should encode valid settings', () => {
-      const settings: Settings = {
-        scrambleDensity: 0.8 as ScrambleDensity,
-      };
+      const settings = Schema.decodeUnknownSync(Settings)({
+        scrambleDensity: 0.8,
+      });
 
       const result = Schema.encodeEither(Settings)(settings);
+
+      console.log('result', result);
 
       expect(Either.isRight(result)).toBe(true);
       if (Either.isRight(result)) {

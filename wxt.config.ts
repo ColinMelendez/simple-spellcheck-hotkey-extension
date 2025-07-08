@@ -6,6 +6,7 @@ import { defineConfig } from 'wxt';
 export default defineConfig({
   // WXT module plugins
   modules: ['@wxt-dev/module-react'],
+  // @ts-expect-error: WxtViteConfig is not typed correctly
   vite: () => ({
     plugins: [
       tailwindcss(),

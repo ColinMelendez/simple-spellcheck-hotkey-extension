@@ -11,6 +11,8 @@
     "paths": {
       "@/*": ["./*"] // not strictly recommended from wxt, but required for shadcn cli to work
     },
+    "resolveJsonModule": true,
+    "types": ["vitest/jsdom"],
     "plugins": [
       {
         "name": "@effect/language-service",
@@ -21,7 +23,6 @@
         }
       }
     ],
-    "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
     "allowJs": true,
     "strict": true,
