@@ -19,7 +19,9 @@
     "install-firefox": "pnpx @puppeteer/browsers install firefox@stable",
     "install-chrome": "pnpx @puppeteer/browsers install chrome@stable",
     "lint": "oxlint && eslint",
-    "lint:fix": "oxlint --fix && eslint --fix"
+    "lint:fix": "oxlint --fix && eslint --fix",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@radix-ui/react-dropdown-menu": "^2.1.15",
