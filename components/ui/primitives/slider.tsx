@@ -22,6 +22,7 @@ function Slider({
   )
 
   return (
+    // @ts-expect-error - value is optional, the underlying library is behind
     <SliderPrimitive.Root
       data-slot="slider"
       defaultValue={defaultValue}

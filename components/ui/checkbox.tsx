@@ -1,3 +1,4 @@
+/* eslint-disable ts/unbound-method */
 'use client';
 
 import { type HTMLMotionProps, motion } from 'motion/react';
