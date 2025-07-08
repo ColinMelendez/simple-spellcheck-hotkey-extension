@@ -2,11 +2,11 @@ import * as Data from 'effect/Data';
 import * as Effect from 'effect/Effect';
 import { browser } from 'wxt/browser';
 
-class BrowserTabsError extends Data.TaggedClass('BrowserTabsError')<{
+export class BrowserTabsError extends Data.TaggedClass('BrowserTabsError')<{
   cause: unknown
 }> {}
 
-class GetCurrentTabUrlError extends Data.TaggedClass('GetCurrentTabUrlError')<{
+export class GetCurrentTabUrlError extends Data.TaggedClass('GetCurrentTabUrlError')<{
   cause: unknown
 }> {}
 
@@ -32,8 +32,11 @@ export class BrowserTabs extends Effect.Service<BrowserTabs>()('BrowserTabs', {
      */
     const currentTabUrl = Effect.gen(function* () {
       const [tab] = yield* use(async (browserTabs) => browserTabs.query({ active: true, currentWindow: true }));
-      if (tab === undefined || tab.url === undefined) {
-        return yield* Effect.fail(new GetCurrentTabUrlError({ cause: 'Tab url was undefined' }));
+      if (tab === undefined) {
+        return yield* Effect.fail(new GetCurrentTabUrlError({ cause: 'Tab is undefined' }));
+      }
+      if (tab.url === undefined) {
+        return yield* Effect.fail(new GetCurrentTabUrlError({ cause: 'Tab has no URL' }));
       }
       return tab.url;
     })

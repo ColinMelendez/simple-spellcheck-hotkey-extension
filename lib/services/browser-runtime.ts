@@ -8,11 +8,11 @@ import * as Data from 'effect/Data';
 import * as Effect from 'effect/Effect';
 import { browser } from 'wxt/browser';
 
-class BrowserRuntimeError extends Data.TaggedClass('BrowserRuntimeError')<{
+export class BrowserRuntimeError extends Data.TaggedClass('BrowserRuntimeError')<{
   cause: unknown
 }> {}
 
-class SendMessageError extends Data.TaggedClass('SendMessageError')<{
+export class SendMessageError extends Data.TaggedClass('SendMessageError')<{
   cause: unknown
 }> {}
 

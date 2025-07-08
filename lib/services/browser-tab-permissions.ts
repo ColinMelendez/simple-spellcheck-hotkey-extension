@@ -25,7 +25,7 @@ const unscriptableOrigins = new Set([
   'testpilot.firefox.com',
 ]);
 
-class BrowserPermissionsError extends Data.TaggedError('BrowserPermissionsError')<{
+export class BrowserPermissionsError extends Data.TaggedError('BrowserPermissionsError')<{
   cause: unknown
 }> {}
 
