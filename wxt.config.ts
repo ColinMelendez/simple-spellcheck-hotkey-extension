@@ -43,7 +43,7 @@ export default defineConfig({
         // the output js file it compiles to listed here to work.
         manifest.content_scripts ??= [];
         manifest.content_scripts.push({
-          matches: ['*://*.google.com/*'],
+          matches: [],
           js: ['/content-scripts/content.js'],
           // If the script has CSS, add it here.
         });

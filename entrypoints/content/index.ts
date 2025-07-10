@@ -16,8 +16,10 @@ export default defineContentScript({
    * `matches` defines the URLs that the content script will *try* to run on,
    * but it does not reflect the permissions required to actually run.
    * Permissions must be defined in the manifest or manually added by the user.
+   * Note that these matches can be modified programmatically after the extension has been installed,
+   * as is the case with the web-ext-permissions-toggle utility.
    */
-  matches: ['*://*.google.com/*'],
+  matches: [],
   main: () => {
     console.log('hello from entrypoints/content/index.ts');
 
