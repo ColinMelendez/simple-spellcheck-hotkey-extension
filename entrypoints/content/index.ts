@@ -17,9 +17,9 @@ export default defineContentScript({
    * but it does not reflect the permissions required to actually run.
    * Permissions must be defined in the manifest or manually added by the user.
    * Note that these matches can be modified programmatically after the extension has been installed,
-   * as is the case with the web-ext-permissions-toggle utility.
+   * as is the case with the web-ext-permissions-toggle utility .
    */
-  matches: [],
+  matches: ['null/*'],
   main: () => {
     console.log('hello from entrypoints/content/index.ts');
 
