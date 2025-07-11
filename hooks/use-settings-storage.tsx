@@ -7,11 +7,7 @@ import { Settings } from '@/lib/domain/settings-schema';
 import { useSettingsStorageRuntime } from '@/lib/runtimes/react-runtimes';
 import { BrowserLocalStorage } from '@/lib/services/browser-local-storage';
 
-/**
- * Update the settings state in storage with a new value
- * @internal
- * @param updatedSettings - The new settings value to store
- */
+// See useSettingsStore exports
 const updateSettingsStorage = (updatedSettings: Settings) => {
   void Effect.gen(function* () {
     const value = yield* Schema.decodeUnknown(Settings)(updatedSettings)
@@ -33,10 +29,19 @@ const updateSettingsStorage = (updatedSettings: Settings) => {
 
 /**
  * A hook to subscribe to and update the state of the extension's stored settings
- * @returns A tuple containing the current settings state and a function to update the settings state in storage
  * The settings value is reactive to changes made to the stored settings anywhere in the extension.
  */
-export const useSettingsStorage = () => {
+export const useSettingsStorage = (): {
+  /**
+   * The current settings state
+   */
+  settings: Settings
+  /**
+   * Update the settings state in storage with a new value
+   * @param updatedSettings - The new settings value to store
+   */
+  updateSettingsStorage: (updatedSettings: Settings) => void
+} => {
   const [settings, setSettings] = useState(DEFAULT_SETTINGS);
 
   const onLocalStorageSettingsChange = useCallback((changes: Record<string, Browser.storage.StorageChange>) => {
@@ -75,8 +80,8 @@ export const useSettingsStorage = () => {
     };
   }, [onLocalStorageSettingsChange]);
 
-  return [
+  return {
     settings,
     updateSettingsStorage,
-  ] as const;
+  } as const;
 }

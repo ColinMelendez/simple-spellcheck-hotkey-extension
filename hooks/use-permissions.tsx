@@ -4,7 +4,27 @@ import { usePermissionsRuntime } from '@/lib/runtimes/react-runtimes';
 import { BrowserTabPermissions } from '@/lib/services/browser-tab-permissions';
 import { BrowserTabs } from '@/lib/services/browser-tabs';
 
-export const usePermissions = () => {
+/**
+ * A hook to manage the permission state of the current tab
+ */
+export const usePermissions = (): {
+  /**
+   * The current permission state of the page
+   */
+  pagePermissionState: boolean
+  /**
+   * A function to toggle the permission state of the page
+   */
+  togglePermissionState: (targetState: boolean) => void
+  /**
+   * The URL of the current tab
+   */
+  tabUrl: string
+  /**
+   * Whether the current tab is scriptable
+   */
+  isScriptable: boolean
+} => {
   const [pagePermissionState, setPagePermissionState] = useState(false);
   const [tabUrl, setTabUrl] = useState<string>('');
   const [isScriptable, setIsScriptable] = useState(true);
@@ -44,10 +64,10 @@ export const usePermissions = () => {
     )
   }, [])
 
-  return [
+  return {
     pagePermissionState,
     togglePermissionState,
     tabUrl,
     isScriptable,
-  ] as const;
+  } as const;
 }

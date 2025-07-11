@@ -31,7 +31,7 @@ const disableScrambleScript = (url: string) => {
 };
 
 export const PermissionsToggle = () => {
-  const [pagePermissionState, togglePermissionState, tabUrl, isScriptable] = usePermissions();
+  const { pagePermissionState, togglePermissionState, tabUrl, isScriptable } = usePermissions();
 
   const setPermissions = useCallback((nextState: CheckedState) => {
     if (nextState === true) {

@@ -4,7 +4,7 @@ import { applyOverlayToSelection, clearOverlays } from '@/lib/utils/active-selec
 
 export const ScrambleDemo = () => {
   const textElementRef = useRef<HTMLParagraphElement | null>(null);
-  const [settings] = useSettingsStorage();
+  const { settings } = useSettingsStorage();
 
   useEffect(() => {
     if (textElementRef.current) {

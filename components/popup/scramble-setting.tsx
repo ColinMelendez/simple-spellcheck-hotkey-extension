@@ -5,7 +5,7 @@ import { useSettingsStorage } from '@/hooks/use-settings-storage';
 import { ScrambleDensity } from '@/lib/domain/settings-schema';
 
 export const ScrambleSetting = () => {
-  const [settings, updateSettingsStorage] = useSettingsStorage();
+  const { settings, updateSettingsStorage } = useSettingsStorage();
 
   const updateSettings = useCallback((scrambleDensity: number) => {
     updateSettingsStorage({

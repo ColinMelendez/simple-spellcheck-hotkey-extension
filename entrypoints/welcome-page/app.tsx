@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
 import { ModeToggle } from '@/components/popup/dark-mode-toggle';
 import { ScrambleSetting } from '@/components/popup/scramble-setting';
-import { ScrambleDemo } from '@/components/scramble-demo';
+import { ScrambleDemo } from '@/components/welcome-page.tsx/scramble-demo';
 
 export const App = () => {
   const toggleRef = useRef<HTMLDivElement>(null);
