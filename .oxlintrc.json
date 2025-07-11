@@ -101,7 +101,6 @@
     "jsdoc/require-property-name": "warn",
     "jsdoc/require-returns-description": "warn",
 
-    // "import/consistent-type-specifier-style": "error",
     "import/first": "error",
     "import/no-duplicates": "error",
     "import/no-mutable-exports": "error",
@@ -133,7 +132,6 @@
     "unicorn/consistent-existence-index-check": "error",
     "unicorn/require-post-message-target-origin": "error",
     "unicorn/consistent-date-clone": "error",
-    // "unicorn/filename-case": "error",
     "unicorn/prefer-modern-dom-apis": "error",
     "unicorn/prefer-array-flat-map": "error",
     "unicorn/prefer-array-index-of": "warn",
@@ -178,7 +176,8 @@
   "settings": {
     "jsdoc": {
       "tagNamePreference": {
-        "vitest-environment": "vitest-environment" // this is a special comment directive that enables per-file environment specifications for vitest tests
+        // this is a special comment directive that enables per-file environment specifications for vitest tests
+        "vitest-environment": "vitest-environment"
       }
     }
   },

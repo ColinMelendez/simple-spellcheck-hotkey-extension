@@ -10,14 +10,12 @@ export const usePermissions = () => {
   const [isScriptable, setIsScriptable] = useState(true);
 
   const togglePermissionState = useCallback((targetState: boolean) => {
-    void Effect.gen(function* () {
-      yield* BrowserTabPermissions.pipe(
-        Effect.flatMap((self) => self.toggleTabPermission(tabUrl, targetState)),
-        Effect.tap((hasPermission) => {
-          setPagePermissionState(hasPermission);
-        }),
-      );
-    }).pipe(
+    void Effect.asVoid(BrowserTabPermissions.pipe(
+      Effect.flatMap((self) => self.toggleTabPermission(tabUrl, targetState)),
+      Effect.tap((hasPermission) => {
+        setPagePermissionState(hasPermission);
+      }),
+    )).pipe(
       Effect.catchTags({
         BrowserPermissionsError: (error) => Effect.logError(error),
       }),
@@ -34,9 +32,7 @@ export const usePermissions = () => {
       yield* BrowserTabPermissions.pipe(
         Effect.tap((self) => setIsScriptable(self.isScriptableByUrl(url))),
         Effect.flatMap((self) => self.checkTabPermissionByUrl(url)),
-        Effect.tap((hasPermission) => {
-          setPagePermissionState(hasPermission);
-        }),
+        Effect.tap((hasPermission) => setPagePermissionState(hasPermission)),
       );
     }).pipe(
       Effect.catchTags({

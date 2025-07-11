@@ -14,13 +14,14 @@ import { BrowserLocalStorage } from '@/lib/services/browser-local-storage';
  */
 const updateSettingsStorage = (updatedSettings: Settings) => {
   void Effect.gen(function* () {
-    const localStorage = yield* BrowserLocalStorage;
     const value = yield* Schema.decodeUnknown(Settings)(updatedSettings)
-    yield* localStorage.use(async (storage) => {
-      void storage.set({
-        [SETTINGS_STORAGE_KEY]: value,
-      });
-    });
+    yield* Effect.flatMap(
+      BrowserLocalStorage,
+      (self) => self.use(async (storage) =>
+        void storage.set({
+          [SETTINGS_STORAGE_KEY]: value,
+        })),
+    );
   }).pipe(
     Effect.catchTags({
       BrowserLocalStorageError: (error) => Effect.logError(error),
@@ -54,12 +55,12 @@ export const useSettingsStorage = () => {
 
   // On initial load, get the latest settings from storage and listen for changes
   useEffect(() => {
-    void Effect.gen(function* () {
-      const localStorage = yield* BrowserLocalStorage;
-      const value = yield* localStorage.use(async (storage) => storage.get(SETTINGS_STORAGE_KEY))
-      const decoded = yield* Schema.decodeUnknown(Settings)(value[SETTINGS_STORAGE_KEY])
-      setSettings(decoded)
-    }).pipe(
+    void Effect.asVoid(BrowserLocalStorage.pipe(
+      Effect.flatMap((self) => self.use(async (storage) => storage.get(SETTINGS_STORAGE_KEY))),
+      Effect.flatMap((value) => Schema.decodeUnknown(Settings)(value[SETTINGS_STORAGE_KEY])),
+      Effect.tap((decoded) => setSettings(decoded)),
+      (_) => _,
+    )).pipe(
       Effect.catchTags({
         ParseError: (error) => Effect.logError(error),
         BrowserLocalStorageError: (error) => Effect.logError(error),
