@@ -18,12 +18,7 @@ export default defineConfig({
     },
   }),
   manifest: {
-    web_accessible_resources: [
-      {
-        resources: ['iframe-ui.html'], // output from entrypoints/iframe-ui/index.html
-        matches: ['*://*/*'],
-      },
-    ],
+    web_accessible_resources: [],
     // Chrome needs this to allow the extension to ask users for permissions on mv3
     optional_host_permissions: ['*://*/*'],
     // @ts-expect-error: Firefox needs this to allow the extension to ask users for permissions on mv2
