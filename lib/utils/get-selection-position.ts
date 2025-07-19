@@ -1,8 +1,8 @@
 /**
- * Get the position of the cursor in the current window
- * @returns The x, y position of the cursor as an object, or undefined if no cursor is found
+ * Get the position of the cursor selection in the current window
+ * @returns The x, y position of the cursor selection as an object, or undefined if no cursor selection is found
  */
-export const getCursorPosition = () => {
+export const getSelectionPosition = () => {
   const selection = window.getSelection();
   if (!selection || selection.rangeCount === 0) {
     return;
