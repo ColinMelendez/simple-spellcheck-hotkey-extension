@@ -1,68 +1,83 @@
-import type { Hotkey } from 'react-hotkeys-hook/packages/react-hotkeys-hook/dist/types';
-import { useMemo, useRef, useState } from 'react';
-import { useHotkeys } from 'react-hotkeys-hook';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/primitives/popover';
+import {
+  Calculator,
+  Calendar,
+  CreditCard,
+  Settings,
+  Smile,
+  User,
+} from 'lucide-react'
 
-const getCursorPosition = () => {
-  const selection = window.getSelection();
-  if (!selection || selection.rangeCount === 0) {
-    return;
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from '@/components/ui/primitives/command'
+
+const checkAndHandleNavKeys = (e: React.KeyboardEvent) => {
+  // Handle Ctrl+j (move down) and Ctrl+k (move up)
+  if (e.ctrlKey && (e.key === 'j' || e.key === 'k')) {
+    e.preventDefault()
+    e.stopPropagation()
+    // Create and dispatch synthetic arrow key events directly to the list
+    const syntheticEvent = new KeyboardEvent('keydown', {
+      key: e.key === 'j' ? 'ArrowDown' : 'ArrowUp',
+      code: e.key === 'j' ? 'ArrowDown' : 'ArrowUp',
+      bubbles: true,
+      cancelable: true,
+    })
+    e.currentTarget.dispatchEvent(syntheticEvent)
   }
+}
 
-  const range = selection.getRangeAt(0);
-  const rect = range.getBoundingClientRect();
-
-  // Use the start of the range for positioning
-  return {
-    x: rect.left + window.scrollX,
-    y: rect.top + window.scrollY,
-  };
-};
-
-export const SuggestionsMenuPopover = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [triggerPosition, setTriggerPosition] = useState({ x: 0, y: 0 });
-  const triggerRef = useRef<HTMLButtonElement>(null);
-
-  const handleHotkey = (_e: KeyboardEvent, _handler: Hotkey) => {
-    const position = getCursorPosition();
-    console.log('position', position);
-    if (position) {
-      setTriggerPosition(position);
-      setIsOpen(true);
-    }
-  };
-
-  useHotkeys('ctrl+h', handleHotkey, {
-    preventDefault: true,
-    enableOnFormTags: true,
-  });
-
-  const style = useMemo(() => ({
-    position: 'absolute',
-    left: `${triggerPosition.x}px`,
-    top: `${triggerPosition.y}px`,
-    opacity: 0,
-    pointerEvents: 'none',
-    zIndex: 9999,
-  } satisfies React.CSSProperties), [triggerPosition]);
-
+export function SuggestionsMenu() {
   return (
-    <div className="size-48 bg-red-500">
-      <Popover open={isOpen} onOpenChange={setIsOpen}>
-        <PopoverTrigger
-          ref={triggerRef}
-          style={style}
-        >
-          {/* Hidden trigger */}
-        </PopoverTrigger>
-        <PopoverContent side="top" align="start">
-          <div>
-            <h1>Suggestions</h1>
-            <p>Positioned at cursor location</p>
-          </div>
-        </PopoverContent>
-      </Popover>
-    </div>
+    <Command
+      className={`
+        rounded-lg border shadow-md
+        md:min-w-[450px]
+      `}
+    >
+      <CommandInput placeholder="Type a command or search..." />
+      <CommandList onKeyDown={checkAndHandleNavKeys}>
+        <CommandEmpty>No results found.</CommandEmpty>
+        <CommandGroup heading="Suggestions">
+          <CommandItem>
+            <Calendar />
+            <span>Calendar</span>
+          </CommandItem>
+          <CommandItem>
+            <Smile />
+            <span>Search Emoji</span>
+          </CommandItem>
+          <CommandItem disabled>
+            <Calculator />
+            <span>Calculator</span>
+          </CommandItem>
+        </CommandGroup>
+        <CommandSeparator />
+        <CommandGroup heading="Settings">
+          <CommandItem>
+            <User />
+            <span>Profile</span>
+            <CommandShortcut>⌘P</CommandShortcut>
+          </CommandItem>
+          <CommandItem>
+            <CreditCard />
+            <span>Billing</span>
+            <CommandShortcut>⌘B</CommandShortcut>
+          </CommandItem>
+          <CommandItem>
+            <Settings />
+            <span>Settings</span>
+            <CommandShortcut>⌘S</CommandShortcut>
+          </CommandItem>
+        </CommandGroup>
+      </CommandList>
+    </Command>
   )
 }
