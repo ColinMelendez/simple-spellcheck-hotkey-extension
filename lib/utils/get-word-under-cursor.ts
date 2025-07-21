@@ -8,6 +8,21 @@ export const getWordUnderCursor = (): string | undefined => {
   if (activeElement && (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT')) {
     // safe to cast as we've already checked the tagName
     const formElement = activeElement as HTMLTextAreaElement | HTMLInputElement;
+
+    // Only handle text-based inputs
+    if (formElement.tagName === 'INPUT') {
+      const inputElement = formElement as HTMLInputElement;
+      if (inputElement.type !== 'text'
+        && inputElement.type !== 'textarea'
+        && inputElement.type !== 'password'
+        && inputElement.type !== 'search'
+        && inputElement.type !== 'email'
+        && inputElement.type !== 'url'
+      ) {
+        return undefined;
+      }
+    }
+
     return extractWordFromFormElement(formElement);
   }
 

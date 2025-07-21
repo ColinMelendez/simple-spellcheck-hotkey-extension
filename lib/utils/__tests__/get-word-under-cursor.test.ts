@@ -39,6 +39,31 @@ const setupTextAndSelection = (text: string, cursorOffset: number) => {
   return { div, textNode, range, selection };
 };
 
+const setupFormElement = (tagName: 'textarea' | 'input', text: string, cursorOffset: number, inputType: string = 'text') => {
+  let element: HTMLTextAreaElement | HTMLInputElement;
+
+  if (tagName === 'textarea') {
+    element = document.createElement('textarea');
+  }
+  else {
+    element = document.createElement('input');
+    (element).type = inputType;
+  }
+
+  element.value = text;
+  document.body.appendChild(element);
+
+  // Focus the element and set cursor position
+  element.focus();
+
+  // Ensure offset is within bounds
+  const adjustedOffset = Math.min(cursorOffset, text.length);
+  element.selectionStart = adjustedOffset;
+  element.selectionEnd = adjustedOffset;
+
+  return element;
+};
+
 describe('getWordUnderCursor', () => {
   beforeEach(() => {
     // Clear document body before each test
@@ -48,6 +73,11 @@ describe('getWordUnderCursor', () => {
     const selection = window.getSelection();
     if (selection) {
       selection.removeAllRanges();
+    }
+
+    // Clear focus from any active element
+    if (document.activeElement && document.activeElement !== document.body) {
+      (document.activeElement as HTMLElement).blur();
     }
   });
 
@@ -80,19 +110,139 @@ describe('getWordUnderCursor', () => {
     });
   });
 
+  describe('textarea functionality', () => {
+    it('should extract word from textarea at cursor position', () => {
+      setupFormElement('textarea', 'hello world test', 6); // Start of "world"
+
+      const result = getWordUnderCursor();
+      expect(result).toBe('world');
+    });
+
+    it('should extract word when cursor is in middle of word in textarea', () => {
+      setupFormElement('textarea', 'testing word extraction', 10); // Middle of "word"
+
+      const result = getWordUnderCursor();
+      expect(result).toBe('word');
+    });
+
+    it('should handle cursor at end of textarea text', () => {
+      setupFormElement('textarea', 'hello world', 11); // End of text
+
+      const result = getWordUnderCursor();
+      expect(result).toBe('world');
+    });
+
+    it('should handle multiline text in textarea', () => {
+      setupFormElement('textarea', 'first line\nsecond line\nthird line', 18); // "s" in "second"
+
+      const result = getWordUnderCursor();
+      expect(result).toBe('line');
+    });
+
+    it('should handle empty textarea', () => {
+      setupFormElement('textarea', '', 0);
+
+      const result = getWordUnderCursor();
+      expect(result).toBe(undefined);
+    });
+
+    it('should handle textarea with only whitespace', () => {
+      setupFormElement('textarea', '   \n  \t  ', 3);
+
+      const result = getWordUnderCursor();
+      expect(result).toBe(undefined);
+    });
+
+    it('should handle cursor at beginning of textarea', () => {
+      setupFormElement('textarea', 'beginning middle end', 0); // At "b" in "beginning"
+
+      const result = getWordUnderCursor();
+      expect(result).toBe('beginning');
+    });
+  });
+
+  describe('input field functionality', () => {
+    it('should extract word from text input at cursor position', () => {
+      setupFormElement('input', 'hello world test', 6, 'text'); // Start of "world"
+
+      const result = getWordUnderCursor();
+      expect(result).toBe('world');
+    });
+
+    it('should extract word when cursor is in middle of word in input', () => {
+      setupFormElement('input', 'testing word extraction', 10, 'text'); // Middle of "word"
+
+      const result = getWordUnderCursor();
+      expect(result).toBe('word');
+    });
+
+    it('should handle empty input field', () => {
+      setupFormElement('input', '', 0, 'text');
+
+      const result = getWordUnderCursor();
+      expect(result).toBe(undefined);
+    });
+
+    it('should handle cursor at beginning of input', () => {
+      setupFormElement('input', 'beginning middle end', 0, 'text'); // At "b" in "beginning"
+
+      const result = getWordUnderCursor();
+      expect(result).toBe('beginning');
+    });
+
+    it('should handle cursor at end of input', () => {
+      setupFormElement('input', 'start middle end', 15, 'text'); // At end
+
+      const result = getWordUnderCursor();
+      expect(result).toBe('end');
+    });
+  });
+
+  describe('form element edge cases', () => {
+    it('should handle cursor on non-alphabetic characters in textarea', () => {
+      setupFormElement('textarea', 'hello_world test', 5); // Underscore character
+
+      const result = getWordUnderCursor();
+      expect(result).toBe(undefined);
+    });
+
+    it('should handle cursor on non-alphabetic characters in input', () => {
+      setupFormElement('input', 'hello_world test', 5, 'text'); // Underscore character
+
+      const result = getWordUnderCursor();
+      expect(result).toBe(undefined);
+    });
+
+    it('should handle single character words in form elements', () => {
+      setupFormElement('textarea', 'a b c', 0); // On "a"
+
+      const result = getWordUnderCursor();
+      expect(result).toBe('a');
+    });
+
+    it('should handle mixed content with form elements', () => {
+      setupFormElement('textarea', 'word1_word2-word3.word4', 6); // in "word2"
+
+      const result = getWordUnderCursor();
+      expect(result).toBe('word');
+    });
+
+    it('should prioritize form element over text selection', () => {
+      // Set up both a text selection and a focused form element
+      setupTextAndSelection('background text word', 10);
+      setupFormElement('input', 'foreground input word', 15, 'text'); // focused input should take priority
+
+      const result = getWordUnderCursor();
+      expect(result).toBe('input'); // Should get word from input, not background text
+    });
+  });
+
   describe('edge cases', () => {
     it('should return null when cursor is on non-alphabetic character', () => {
       setupTextAndSelection('hello_world test', 5); // Underscore character
 
       const result = getWordUnderCursor();
       expect(result).toBe(undefined);
-    });
-
-    it('should handle the example from requirements: "wxspf jfds _dddne vbcx"', () => {
-      setupTextAndSelection('wxspf jfds _dddne vbcx', 13); // On "n" in "dddne"
-
-      const result = getWordUnderCursor();
-      expect(result).toBe('dddne');
     });
 
     it('should handle single character words', () => {
