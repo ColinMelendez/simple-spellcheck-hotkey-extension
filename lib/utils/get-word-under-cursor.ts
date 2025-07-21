@@ -3,6 +3,15 @@
  * @returns The word under the cursor, or undefined if no word is under the cursor
  */
 export const getWordUnderCursor = (): string | undefined => {
+  // First, check if we're dealing with a form element (textarea or input)
+  const activeElement = document.activeElement;
+  if (activeElement && (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT')) {
+    // safe to cast as we've already checked the tagName
+    const formElement = activeElement as HTMLTextAreaElement | HTMLInputElement;
+    return extractWordFromFormElement(formElement);
+  }
+
+  // Fall back to selection-based extraction for contentEditable and regular text
   const selection = window.getSelection();
   if (!selection || selection.rangeCount === 0) {
     return undefined;
@@ -97,18 +106,29 @@ function isAlphabetic(char: string | undefined): boolean {
 }
 
 /**
- * Extract the word at (intersected by) a given offset in a text node
- * @param textNode - The text node to extract the word from
+ * Extract the word under the cursor from a form element (textarea or input)
+ * @param element - The form element to extract the word from
+ * @returns The word under the cursor, or undefined if no word is found
+ */
+function extractWordFromFormElement(element: HTMLTextAreaElement | HTMLInputElement): string | undefined {
+  const text = element.value;
+  const cursorPosition = element.selectionStart;
+
+  if (cursorPosition === null || text.length === 0) {
+    return undefined;
+  }
+
+  // Use the same word extraction logic as the text node version
+  return extractWordAtTextPosition(text, cursorPosition);
+}
+
+/**
+ * Extract the word at a given position in a text string
+ * @param text - The text to extract the word from
  * @param offset - The offset to extract the word from
  * @returns The word at the offset, or undefined if the offset is out of bounds or the character is not alphabetic
  */
-function extractWordAtOffset(textNode: Text, offset: number): string | undefined {
-  const textContent = textNode.textContent;
-  if (textContent === null) {
-    return undefined;
-  }
-  const text = textContent;
-
+function extractWordAtTextPosition(text: string, offset: number): string | undefined {
   // Ensure offset is within bounds
   if (offset < 0 || offset > text.length) {
     return undefined;
@@ -146,4 +166,19 @@ function extractWordAtOffset(textNode: Text, offset: number): string | undefined
   // Extract the word
   const word = text.substring(start, end + 1);
   return word.length > 0 ? word : undefined;
+}
+
+/**
+ * Extract the word at (intersected by) a given offset in a text node
+ * @param textNode - The text node to extract the word from
+ * @param offset - The offset to extract the word from
+ * @returns The word at the offset, or undefined if the offset is out of bounds or the character is not alphabetic
+ */
+function extractWordAtOffset(textNode: Text, offset: number): string | undefined {
+  const textContent = textNode.textContent;
+  if (textContent === null) {
+    return undefined;
+  }
+
+  return extractWordAtTextPosition(textContent, offset);
 }
