@@ -2,7 +2,9 @@
  * Get the word under the cursor's current position
  * @returns The word under the cursor, or undefined if no word is under the cursor
  */
-export const getWordUnderCursor = (): string | undefined => {
+export const getWordUnderCursor = ():
+  | { word: string, element?: HTMLTextAreaElement | HTMLInputElement, range?: { start: number, end: number } }
+  | undefined => {
   // First, check if we're dealing with a form element (textarea or input)
   const activeElement = document.activeElement;
   if (activeElement && (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT')) {
@@ -23,7 +25,15 @@ export const getWordUnderCursor = (): string | undefined => {
       }
     }
 
-    return extractWordFromFormElement(formElement);
+    const result = extractWordFromFormElement(formElement);
+    if (result) {
+      return {
+        word: result.word,
+        element: formElement,
+        range: result.range,
+      };
+    }
+    return undefined;
   }
 
   // Fall back to selection-based extraction for contentEditable and regular text
@@ -46,10 +56,12 @@ export const getWordUnderCursor = (): string | undefined => {
     if (!textNode) {
       return undefined;
     }
-    return extractWordAtOffset(textNode.node, textNode.offset);
+    const result = extractWordAtOffset(textNode.node, textNode.offset);
+    return result ? { word: result.word } : undefined;
   }
 
-  return extractWordAtOffset(container as Text, offset);
+  const result = extractWordAtOffset(container as Text, offset);
+  return result ? { word: result.word } : undefined;
 };
 
 /**
@@ -123,9 +135,9 @@ function isAlphabetic(char: string | undefined): boolean {
 /**
  * Extract the word under the cursor from a form element (textarea or input)
  * @param element - The form element to extract the word from
- * @returns The word under the cursor, or undefined if no word is found
+ * @returns The word under the cursor and its range, or undefined if no word is found
  */
-function extractWordFromFormElement(element: HTMLTextAreaElement | HTMLInputElement): string | undefined {
+function extractWordFromFormElement(element: HTMLTextAreaElement | HTMLInputElement): { word: string, range: { start: number, end: number } } | undefined {
   const text = element.value;
   const cursorPosition = element.selectionStart;
 
@@ -141,9 +153,9 @@ function extractWordFromFormElement(element: HTMLTextAreaElement | HTMLInputElem
  * Extract the word at a given position in a text string
  * @param text - The text to extract the word from
  * @param offset - The offset to extract the word from
- * @returns The word at the offset, or undefined if the offset is out of bounds or the character is not alphabetic
+ * @returns The word at the offset and its range, or undefined if the offset is out of bounds or the character is not alphabetic
  */
-function extractWordAtTextPosition(text: string, offset: number): string | undefined {
+function extractWordAtTextPosition(text: string, offset: number): { word: string, range: { start: number, end: number } } | undefined {
   // Ensure offset is within bounds
   if (offset < 0 || offset > text.length) {
     return undefined;
@@ -180,16 +192,16 @@ function extractWordAtTextPosition(text: string, offset: number): string | undef
 
   // Extract the word
   const word = text.substring(start, end + 1);
-  return word.length > 0 ? word : undefined;
+  return word.length > 0 ? { word, range: { start, end: end + 1 } } : undefined;
 }
 
 /**
  * Extract the word at (intersected by) a given offset in a text node
  * @param textNode - The text node to extract the word from
  * @param offset - The offset to extract the word from
- * @returns The word at the offset, or undefined if the offset is out of bounds or the character is not alphabetic
+ * @returns The word at the offset and its range, or undefined if the offset is out of bounds or the character is not alphabetic
  */
-function extractWordAtOffset(textNode: Text, offset: number): string | undefined {
+function extractWordAtOffset(textNode: Text, offset: number): { word: string, range: { start: number, end: number } } | undefined {
   const textContent = textNode.textContent;
   if (textContent === null) {
     return undefined;

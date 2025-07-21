@@ -92,21 +92,21 @@ describe('getWordUnderCursor', () => {
       setupTextAndSelection('hello world test', 6); // Start of "world"
 
       const result = getWordUnderCursor();
-      expect(result).toBe('world');
+      expect(result?.word).toBe('world');
     });
 
     it('should extract word when cursor is in middle of word', () => {
       setupTextAndSelection('testing word extraction', 10); // Middle of "word"
 
       const result = getWordUnderCursor();
-      expect(result).toBe('word');
+      expect(result?.word).toBe('word');
     });
 
     it('should handle cursor at end of text', () => {
       setupTextAndSelection('hello world', 11); // End of text
 
       const result = getWordUnderCursor();
-      expect(result).toBe('world');
+      expect(result?.word).toBe('world');
     });
   });
 
@@ -115,28 +115,28 @@ describe('getWordUnderCursor', () => {
       setupFormElement('textarea', 'hello world test', 6); // Start of "world"
 
       const result = getWordUnderCursor();
-      expect(result).toBe('world');
+      expect(result?.word).toBe('world');
     });
 
     it('should extract word when cursor is in middle of word in textarea', () => {
       setupFormElement('textarea', 'testing word extraction', 10); // Middle of "word"
 
       const result = getWordUnderCursor();
-      expect(result).toBe('word');
+      expect(result?.word).toBe('word');
     });
 
     it('should handle cursor at end of textarea text', () => {
       setupFormElement('textarea', 'hello world', 11); // End of text
 
       const result = getWordUnderCursor();
-      expect(result).toBe('world');
+      expect(result?.word).toBe('world');
     });
 
     it('should handle multiline text in textarea', () => {
       setupFormElement('textarea', 'first line\nsecond line\nthird line', 18); // "s" in "second"
 
       const result = getWordUnderCursor();
-      expect(result).toBe('line');
+      expect(result?.word).toBe('line');
     });
 
     it('should handle empty textarea', () => {
@@ -157,7 +157,7 @@ describe('getWordUnderCursor', () => {
       setupFormElement('textarea', 'beginning middle end', 0); // At "b" in "beginning"
 
       const result = getWordUnderCursor();
-      expect(result).toBe('beginning');
+      expect(result?.word).toBe('beginning');
     });
   });
 
@@ -166,14 +166,14 @@ describe('getWordUnderCursor', () => {
       setupFormElement('input', 'hello world test', 6, 'text'); // Start of "world"
 
       const result = getWordUnderCursor();
-      expect(result).toBe('world');
+      expect(result?.word).toBe('world');
     });
 
     it('should extract word when cursor is in middle of word in input', () => {
       setupFormElement('input', 'testing word extraction', 10, 'text'); // Middle of "word"
 
       const result = getWordUnderCursor();
-      expect(result).toBe('word');
+      expect(result?.word).toBe('word');
     });
 
     it('should handle empty input field', () => {
@@ -187,14 +187,14 @@ describe('getWordUnderCursor', () => {
       setupFormElement('input', 'beginning middle end', 0, 'text'); // At "b" in "beginning"
 
       const result = getWordUnderCursor();
-      expect(result).toBe('beginning');
+      expect(result?.word).toBe('beginning');
     });
 
     it('should handle cursor at end of input', () => {
       setupFormElement('input', 'start middle end', 15, 'text'); // At end
 
       const result = getWordUnderCursor();
-      expect(result).toBe('end');
+      expect(result?.word).toBe('end');
     });
   });
 
@@ -217,14 +217,14 @@ describe('getWordUnderCursor', () => {
       setupFormElement('textarea', 'a b c', 0); // On "a"
 
       const result = getWordUnderCursor();
-      expect(result).toBe('a');
+      expect(result?.word).toBe('a');
     });
 
     it('should handle mixed content with form elements', () => {
       setupFormElement('textarea', 'word1_word2-word3.word4', 6); // in "word2"
 
       const result = getWordUnderCursor();
-      expect(result).toBe('word');
+      expect(result?.word).toBe('word');
     });
 
     it('should prioritize form element over text selection', () => {
@@ -233,7 +233,7 @@ describe('getWordUnderCursor', () => {
       setupFormElement('input', 'foreground input word', 15, 'text'); // focused input should take priority
 
       const result = getWordUnderCursor();
-      expect(result).toBe('input'); // Should get word from input, not background text
+      expect(result?.word).toBe('input'); // Should get word from input, not background text
     });
   });
 
@@ -249,7 +249,7 @@ describe('getWordUnderCursor', () => {
       setupTextAndSelection('a b c', 0); // On "a"
 
       const result = getWordUnderCursor();
-      expect(result).toBe('a');
+      expect(result?.word).toBe('a');
     });
 
     it('should handle empty text content', () => {
@@ -290,7 +290,7 @@ describe('getWordUnderCursor', () => {
         setupTextAndSelection(text, offset);
 
         const result = getWordUnderCursor();
-        expect(result).toBe(expected);
+        expect(result?.word).toBe(expected);
       }
     });
 
@@ -308,7 +308,7 @@ describe('getWordUnderCursor', () => {
         setupTextAndSelection(text, offset);
 
         const result = getWordUnderCursor();
-        expect(result).toBe(expected);
+        expect(result?.word).toBe(expected);
       }
     });
 
@@ -325,7 +325,7 @@ describe('getWordUnderCursor', () => {
         setupTextAndSelection(text, offset);
 
         const result = getWordUnderCursor();
-        expect(result).toBe(expected);
+        expect(result?.word).toBe(expected);
       }
     });
   });
@@ -351,14 +351,14 @@ describe('getWordUnderCursor', () => {
       }
 
       const result = getWordUnderCursor();
-      expect(result).toBe('second');
+      expect(result?.word).toBe('second');
     });
 
     it('should handle collapsed selections (cursor)', () => {
       setupTextAndSelection('cursor test', 7); // cursor position at "test"
 
       const result = getWordUnderCursor();
-      expect(result).toBe('test');
+      expect(result?.word).toBe('test');
     });
   });
 
@@ -382,14 +382,14 @@ describe('getWordUnderCursor', () => {
       }
 
       const result = getWordUnderCursor();
-      expect(result).toBe('word');
+      expect(result?.word).toBe('word');
     });
 
     it('should handle unicode characters correctly', () => {
       setupTextAndSelection('café naïve résumé', 5); // On "n" in "naïve"
 
       const result = getWordUnderCursor();
-      expect(result).toBe('na'); // Should only get alphabetic ASCII characters
+      expect(result?.word).toBe('na'); // Should only get alphabetic ASCII characters
     });
 
     it('should handle very long words', () => {
@@ -398,7 +398,7 @@ describe('getWordUnderCursor', () => {
       setupTextAndSelection(text, 50); // Middle of long word
 
       const result = getWordUnderCursor();
-      expect(result).toBe(longWord);
+      expect(result?.word).toBe(longWord);
     });
   });
 });
