@@ -1,6 +1,8 @@
 import { createRoot, type Root } from 'react-dom/client';
 import { createShadowRootUi } from 'wxt/utils/content-script-ui/shadow-root';
 import { defineContentScript } from 'wxt/utils/define-content-script';
+import { getSelectionPosition } from '@/lib/utils/get-selection-position';
+import { getWordUnderCursor } from '@/lib/utils/get-word-under-cursor';
 import { SuggestionsMenu } from './suggestions-menu-popover';
 import '~/assets/tailwind.css';
 
@@ -20,6 +22,20 @@ export default defineContentScript({
         ui.remove();
       }
 
+      // get the position of the cursor
+      const cursorPosition = getSelectionPosition();
+      if (cursorPosition === undefined) {
+        console.log('no cursor position found');
+        return;
+      }
+
+      // get the word under the cursor
+      const wordUnderCursor = getWordUnderCursor();
+      if (wordUnderCursor === undefined) {
+        console.log('no word under cursor found');
+        return;
+      }
+
       // define the ui for the suggestions menu popover
       ui = await createShadowRootUi(ctx, {
         name: 'suggestions-menu-popover-shadow-root',
@@ -32,7 +48,12 @@ export default defineContentScript({
           uiContainer.append(wrapper);
           // mount the root react component on the wrapper element
           const root = createRoot(wrapper);
-          root.render(<SuggestionsMenu />);
+          root.render(
+            <SuggestionsMenu
+              wordUnderCursor={wordUnderCursor}
+              position={cursorPosition}
+            />,
+          );
           // return the root and wrapper elements so that they can be accessed and removed later
           return { root, wrapper };
         },
@@ -50,6 +71,7 @@ export default defineContentScript({
       // open the suggestions menu if cmd + . key is pressed
       if (event.metaKey && event.key === '.') {
         event.preventDefault();
+        console.log('open suggestions menu triggered');
         void mountSuggestionsMenu();
       }
       // close the suggestions menu if the escape key is pressed
