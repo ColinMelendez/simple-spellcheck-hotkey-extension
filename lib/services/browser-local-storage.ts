@@ -2,8 +2,8 @@ import * as Data from 'effect/Data';
 import * as Effect from 'effect/Effect';
 import { browser } from 'wxt/browser';
 
-export class BrowserLocalStorageError extends Data.TaggedClass('BrowserLocalStorageError')<{
-  cause: unknown
+export class BrowserLocalStorageError<T = unknown> extends Data.TaggedClass('BrowserLocalStorageError')<{
+  cause: T
 }> {}
 
 export class BrowserLocalStorage extends Effect.Service<BrowserLocalStorage>()('BrowserLocalStorage', {

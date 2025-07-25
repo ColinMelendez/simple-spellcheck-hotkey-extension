@@ -2,8 +2,8 @@ import * as Data from 'effect/Data';
 import * as Effect from 'effect/Effect';
 import addPermissionToggle from 'webext-permission-toggle';
 
-class PermissionsMenuOptionError extends Data.TaggedClass('PermissionsMenuOptionError')<{
-  cause: unknown
+class PermissionsMenuOptionError<T = unknown> extends Data.TaggedClass('PermissionsMenuOptionError')<{
+  cause: T
 }> {}
 
 export class PermissionsMenuOption extends Effect.Service<PermissionsMenuOption>()('PermissionsMenuOption', {

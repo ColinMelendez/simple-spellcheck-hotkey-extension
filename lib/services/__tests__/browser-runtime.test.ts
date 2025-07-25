@@ -1,7 +1,6 @@
 // explanation: the types for the fake browser implementation in extensions are not propagating for some reason. this is safe.
 /* eslint-disable ts/no-unsafe-call */
 /* eslint-disable ts/no-unsafe-member-access */
-import type { Message } from '../../domain/message-schema';
 import { expect, it } from '@effect/vitest';
 import * as Effect from 'effect/Effect';
 import * as Exit from 'effect/Exit';
@@ -62,8 +61,7 @@ describe('browserRuntime', () => {
     Effect.gen(function* () {
       const service = yield* BrowserRuntime;
 
-      const message: Message = {
-        messageCategory: 'disable-scramble',
+      const message = {
         payload: { test: 'data' },
       };
 
@@ -84,8 +82,8 @@ describe('browserRuntime', () => {
     Effect.gen(function* () {
       const service = yield* BrowserRuntime;
 
-      const message: Message = {
-        messageCategory: 'disable-scramble',
+      const message = {
+        payload: { test: 'data' },
       };
 
       Object.defineProperty(fakeBrowser.runtime, 'sendMessage', {

@@ -3,17 +3,16 @@
  * the extension browser runtime namespace effectfully.
  */
 
-import type { Message } from '../domain/message-schema';
 import * as Data from 'effect/Data';
 import * as Effect from 'effect/Effect';
 import { browser } from 'wxt/browser';
 
-export class BrowserRuntimeError extends Data.TaggedClass('BrowserRuntimeError')<{
-  cause: unknown
+export class BrowserRuntimeError<T = unknown> extends Data.TaggedClass('BrowserRuntimeError')<{
+  cause: T
 }> {}
 
-export class SendMessageError extends Data.TaggedClass('SendMessageError')<{
-  cause: unknown
+export class SendMessageError<T = unknown> extends Data.TaggedClass('SendMessageError')<{
+  cause: T
 }> {}
 
 export class BrowserRuntime extends Effect.Service<BrowserRuntime>() ('BrowserRuntime', {
@@ -38,7 +37,7 @@ export class BrowserRuntime extends Effect.Service<BrowserRuntime>() ('BrowserRu
      * @returns - An effect that succeeds with the response, or fails with an error if
      * any errors are thrown while sending the message.
      */
-    const sendMessage = (message: Message) =>
+    const sendMessage = <T>(message: T) =>
       Effect.tryPromise({
         try: async <Response = unknown>(): Promise<Response> => runtime.sendMessage(message),
         catch: (cause) => new SendMessageError({ cause }),

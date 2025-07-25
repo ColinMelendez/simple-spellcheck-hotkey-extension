@@ -2,12 +2,12 @@ import * as Data from 'effect/Data';
 import * as Effect from 'effect/Effect';
 import { browser } from 'wxt/browser';
 
-export class BrowserTabsError extends Data.TaggedClass('BrowserTabsError')<{
-  cause: unknown
+export class BrowserTabsError<T = unknown> extends Data.TaggedClass('BrowserTabsError')<{
+  cause: T
 }> {}
 
-export class GetCurrentTabUrlError extends Data.TaggedClass('GetCurrentTabUrlError')<{
-  cause: unknown
+export class GetCurrentTabUrlError<T = unknown> extends Data.TaggedClass('GetCurrentTabUrlError')<{
+  cause: T
 }> {}
 
 export class BrowserTabs extends Effect.Service<BrowserTabs>()('BrowserTabs', {
