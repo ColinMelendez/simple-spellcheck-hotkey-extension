@@ -85,6 +85,7 @@
     "prefer-object-has-own": "error",
     "operator-assignment": "error",
     "require-yield": "off",
+    "no-unused-vars": "off", // handle this silently in eslint
 
     "node/no-new-require": "error",
     "node/no-exports-assign": "warn",
