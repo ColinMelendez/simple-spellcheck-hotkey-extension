@@ -4,14 +4,16 @@
  */
 
 import type { Browser } from 'wxt/browser';
-import * as Console from 'effect/Console';
 import * as Data from 'effect/Data';
+import * as Duration from 'effect/Duration';
 import * as Effect from 'effect/Effect';
 import * as Match from 'effect/Match';
 import * as Request from 'effect/Request';
 import * as RequestResolver from 'effect/RequestResolver';
+import * as Schedule from 'effect/Schedule';
 import * as Schema from 'effect/Schema';
 import { BrowserRuntime } from '@/lib/services/browser-runtime';
+import { Spellcheck, SpellcheckError } from '@/lib/services/spellcheck';
 
 // ------------------------------
 // Data Schemas
@@ -75,9 +77,18 @@ export const requestSuggestionsHandler = Effect.fn('RequestSuggestionsHandler')(
     _: Browser.runtime.MessageSender,
     sendResponse: (response?: unknown) => void,
   ) {
-    yield* Console.log(sendResponse)
-    return yield* Console.log(request)
+    yield* Spellcheck.pipe(
+      Effect.flatMap((spellcheck) =>
+        spellcheck.use((checker) => checker.suggest(request.word)),
+      ),
+      Effect.tap(sendResponse),
+    )
   },
+  Effect.retry({
+    while: (error) => error instanceof SpellcheckError,
+    times: 3,
+    schedule: Schedule.exponential(Duration.seconds(0.5), 2),
+  }),
 )
 
 export const messageHandler = Effect.fn('MessageHandler')(function* (
@@ -87,7 +98,9 @@ export const messageHandler = Effect.fn('MessageHandler')(function* (
 ) {
   const message = yield* Schema.decodeUnknown(Message)(request)
   const routeMessageByPayload = Match.type<typeof message.payload>().pipe(
-    Match.tag('RequestSuggestionsMessage', (payload) => requestSuggestionsHandler(payload, sender, sendResponse)),
+    Match.tag('RequestSuggestionsMessage',
+      (payload) => requestSuggestionsHandler(payload, sender, sendResponse)
+    ),
     Match.exhaustive,
   )
   return yield* routeMessageByPayload(message.payload)
