@@ -71,7 +71,7 @@ export const GetSuggestionsResolver = RequestResolver.fromEffect(
 // Handlers
 // ------------------------------
 
-export const requestSuggestionsHandler = Effect.fn('RequestSuggestionsHandler')(
+const requestSuggestionsHandler = Effect.fn('RequestSuggestionsHandler')(
   function* (
     request: RequestSuggestionsMessage,
     _: Browser.runtime.MessageSender,
@@ -91,17 +91,18 @@ export const requestSuggestionsHandler = Effect.fn('RequestSuggestionsHandler')(
   }),
 )
 
-export const messageHandler = Effect.fn('MessageHandler')(function* (
+export const messageRouter = Effect.fn('MessageRouter')(function* (
   request: unknown,
   sender: Browser.runtime.MessageSender,
   sendResponse: (response?: unknown) => void,
 ) {
   const message = yield* Schema.decodeUnknown(Message)(request)
+
   const routeMessageByPayload = Match.type<typeof message.payload>().pipe(
-    Match.tag('RequestSuggestionsMessage',
-      (payload) => requestSuggestionsHandler(payload, sender, sendResponse)
+    Match.tag('RequestSuggestionsMessage', (payload) => requestSuggestionsHandler(payload, sender, sendResponse),
     ),
     Match.exhaustive,
   )
+
   return yield* routeMessageByPayload(message.payload)
 })
