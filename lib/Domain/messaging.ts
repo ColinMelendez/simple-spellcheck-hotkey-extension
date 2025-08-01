@@ -14,13 +14,14 @@ import * as Schedule from 'effect/Schedule';
 import * as Schema from 'effect/Schema';
 import { BrowserRuntime } from '@/lib/services/browser-runtime';
 import { Spellcheck, SpellcheckError } from '@/lib/services/spellcheck';
+import { parseError } from 'effect/ParseResult';
 
 // ------------------------------
 // Data Schemas
 // ------------------------------
 
 export class Suggestions extends Schema.Class<Suggestions>('Suggestions')({
-  suggestions: Schema.Array(Schema.String),
+  words: Schema.Array(Schema.String),
 }) {}
 
 export class GetSuggestionsError<T = unknown> extends Data.TaggedError('GetSuggestionsError')<{
@@ -59,8 +60,14 @@ export class GetSuggestions extends Request.TaggedClass('GetSuggestions')<
 export const GetSuggestionsResolver = RequestResolver.fromEffect(
   Effect.fn('GetSuggestionsResolver')(function* (request: GetSuggestions) {
     return yield* BrowserRuntime.pipe(
-      Effect.flatMap((runtime) => runtime.sendMessage(request)),
+      Effect.flatMap((runtime) => runtime.sendMessage(Message.make({
+        payload: RequestSuggestionsMessage.make({ word: request.word }),
+      }))),
+      _=>_,
+      Effect.tap((suggestions) => Effect.log(`suggestions: ${suggestions}`)),
       Effect.andThen(Schema.decodeUnknown(Suggestions)),
+      _=>_,
+      Effect.tapError((error) => Effect.log(`error: ${error}`)),
     )
   }, Effect.catchAll((cause) => new GetSuggestionsError({ cause }))),
 ).pipe(
@@ -81,6 +88,7 @@ const requestSuggestionsHandler = Effect.fn('RequestSuggestionsHandler')(
       Effect.flatMap((spellcheck) =>
         spellcheck.use((checker) => checker.suggest(request.word)),
       ),
+      Effect.andThen((words) => Suggestions.make({ words })),
       Effect.tap(sendResponse),
     )
   },
