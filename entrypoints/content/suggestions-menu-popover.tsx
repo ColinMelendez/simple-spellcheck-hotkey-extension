@@ -1,25 +1,17 @@
-import {
-  Calculator,
-  Calendar,
-  CreditCard,
-  Settings,
-  Smile,
-  User,
-} from 'lucide-react'
-
+import * as Effect from 'effect/Effect'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator,
-  CommandShortcut,
 } from '@/components/ui/primitives/command'
+import { GetSuggestions, GetSuggestionsResolver } from '@/lib/domain/messaging'
+import { ScriptRuntime } from '@/lib/runtimes/script-runtime'
 
-const checkAndHandleNavKeys = (e: React.KeyboardEvent) => {
+const handleNavKeys = (e: React.KeyboardEvent) => {
   // Handle Ctrl+j (move down) and Ctrl+k (move up)
   if (e.ctrlKey && (e.key === 'j' || e.key === 'k')) {
     e.preventDefault()
@@ -52,9 +44,22 @@ export function SuggestionsMenu({
   console.log('wordUnderCursor', wordUnderCursor);
   console.log('cursorPosition', position);
 
-  const menuRef = useRef<HTMLDivElement>(null)
-  const commandInputRef = useRef<HTMLInputElement>(null)
-  const [adjustedPosition, setAdjustedPosition] = useState(position)
+  const menuRef = useRef<HTMLDivElement>(null);
+  const commandListRef = useRef<HTMLInputElement>(null);
+  const [adjustedPosition, setAdjustedPosition] = useState(position);
+  const [suggestedWords, setSuggestedWords] = useState<readonly string[]>([]);
+
+  useEffect(() => {
+    console.log('running suggestions fetch');
+    void ScriptRuntime.runPromise(
+      Effect.request(new GetSuggestions({ word: wordUnderCursor.word }), GetSuggestionsResolver),
+    ).then((suggestions) => {
+      console.log('suggestions', suggestions);
+      setSuggestedWords(suggestions.words);
+    }).catch((error) => {
+      console.error('error fetching suggestions', error);
+    });
+  }, [wordUnderCursor.word])
 
   useLayoutEffect(() => {
     if (!menuRef.current)
@@ -89,14 +94,38 @@ export function SuggestionsMenu({
     newY = Math.max(minY, newY)
 
     setAdjustedPosition({ x: newX, y: newY })
-  }, [position, wordUnderCursor.word]) // Re-run when position or word changes
+  }, [position, wordUnderCursor.word])
 
   useEffect(() => {
     // Auto-focus the command input when component mounts
-    if (commandInputRef.current) {
-      commandInputRef.current.focus()
+    if (commandListRef.current) {
+      commandListRef.current.focus()
     }
   }, [])
+
+  const handleSuggestionSelect = (selectedWord: string) => {
+    if (!wordUnderCursor.element || !wordUnderCursor.range) {
+      return;
+    }
+
+    const element = wordUnderCursor.element;
+    const { start, end } = wordUnderCursor.range;
+
+    // Replace the text at the specified range
+    const currentValue = element.value;
+    const newValue = currentValue.slice(0, start) + selectedWord + currentValue.slice(end);
+    element.value = newValue;
+
+    // Set cursor position after the replaced word
+    const newCursorPosition = start + selectedWord.length;
+    element.setSelectionRange(newCursorPosition, newCursorPosition);
+
+    // Focus back to the original element
+    element.focus();
+
+    // Trigger input event to notify any listeners of the value change
+    element.dispatchEvent(new Event('input', { bubbles: true }));
+  };
 
   const positioningStyle = useMemo(() => {
     return {
@@ -118,44 +147,19 @@ export function SuggestionsMenu({
           md:min-w-[450px]
         `}
       >
-        <CommandInput
-          ref={commandInputRef}
-          placeholder={`${wordUnderCursor.word}...`}
-        />
-        <CommandList onKeyDown={checkAndHandleNavKeys}>
-          <CommandEmpty>No results found.</CommandEmpty>
+        <CommandList
+          ref={commandListRef}
+          onKeyDown={handleNavKeys}
+        >
           <CommandGroup heading="Suggestions">
-            <CommandItem>
-              <Calendar />
-              <span>Calendar</span>
-            </CommandItem>
-            <CommandItem>
-              <Smile />
-              <span>Search Emoji</span>
-            </CommandItem>
-            <CommandItem disabled>
-              <Calculator />
-              <span>Calculator</span>
-            </CommandItem>
+            <CommandEmpty>No results found.</CommandEmpty>
+            {suggestedWords.map((word) => (
+              <CommandItem key={word} onSelect={() => handleSuggestionSelect(word)}>
+                <span>{word}</span>
+              </CommandItem>
+            ))}
           </CommandGroup>
           <CommandSeparator />
-          <CommandGroup heading="Settings">
-            <CommandItem>
-              <User />
-              <span>Profile</span>
-              <CommandShortcut>⌘P</CommandShortcut>
-            </CommandItem>
-            <CommandItem>
-              <CreditCard />
-              <span>Billing</span>
-              <CommandShortcut>⌘B</CommandShortcut>
-            </CommandItem>
-            <CommandItem>
-              <Settings />
-              <span>Settings</span>
-              <CommandShortcut>⌘S</CommandShortcut>
-            </CommandItem>
-          </CommandGroup>
         </CommandList>
       </Command>
     </div>

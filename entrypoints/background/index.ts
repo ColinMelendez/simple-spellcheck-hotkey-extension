@@ -30,8 +30,9 @@ const backgroundEffect = Effect.gen(function* () {
       });
       // Set up the message handler for the background runtime.
       runtime.onMessage.addListener((request, sender, sendResponse) => {
+        console.log('onMessage listener triggered', request);
         void backgroundRuntime.runPromise(messageRouter(request, sender, sendResponse))
-        return true; // synchronously return true in the listener to indicate an asynchronous response
+        return true; // must synchronously return true in the listener to indicate an asynchronous response
       })
     })),
   )
