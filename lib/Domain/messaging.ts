@@ -14,7 +14,6 @@ import * as Schedule from 'effect/Schedule';
 import * as Schema from 'effect/Schema';
 import { BrowserRuntime } from '@/lib/services/browser-runtime';
 import { Spellcheck, SpellcheckError } from '@/lib/services/spellcheck';
-import { parseError } from 'effect/ParseResult';
 
 // ------------------------------
 // Data Schemas
@@ -63,11 +62,8 @@ export const GetSuggestionsResolver = RequestResolver.fromEffect(
       Effect.flatMap((runtime) => runtime.sendMessage(Message.make({
         payload: RequestSuggestionsMessage.make({ word: request.word }),
       }))),
-      _=>_,
-      Effect.tap((suggestions) => Effect.log(`suggestions: ${suggestions}`)),
       Effect.andThen(Schema.decodeUnknown(Suggestions)),
-      _=>_,
-      Effect.tapError((error) => Effect.log(`error: ${error}`)),
+      Effect.tap((suggestions) => Effect.log(`suggestions: ${suggestions.words.join(', ')}`)),
     )
   }, Effect.catchAll((cause) => new GetSuggestionsError({ cause }))),
 ).pipe(

@@ -1,6 +1,8 @@
 import * as Data from 'effect/Data';
 import * as Effect from 'effect/Effect';
 import Typo from 'typo-js';
+import { affData } from '@/lib/domain/spellcheck-affixes-en-us';
+import { dicData } from '@/lib/domain/spellcheck-dict-en-us';
 
 export class SpellcheckError<T = unknown> extends Data.TaggedClass('SpellcheckError')<{
   cause: T
@@ -9,8 +11,8 @@ export class SpellcheckError<T = unknown> extends Data.TaggedClass('SpellcheckEr
 // implement a spell-checker service that wraps a singleton typo object and provides access to it via the use pattern
 export class Spellcheck extends Effect.Service<Spellcheck>()('Spellcheck', {
   effect: Effect.gen(function* () {
-    // singleton instance of the typo-js spellchecker
-    const checker = new Typo('en_US');
+    // Create typo instance with manually loaded data
+    const checker = new Typo('en_US', affData, dicData);
 
     /**
      * Use the wrapped spellchecker instance for any of it's internal methods, safely wrapped in an effect.
