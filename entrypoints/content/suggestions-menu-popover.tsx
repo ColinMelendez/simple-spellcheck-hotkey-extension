@@ -11,7 +11,14 @@ import {
 import { GetSuggestions, GetSuggestionsResolver } from '@/lib/domain/messaging'
 import { ScriptRuntime } from '@/lib/runtimes/script-runtime'
 
-const handleNavKeys = (e: React.KeyboardEvent) => {
+const preventControlPropagation = (e: React.KeyboardEvent) => {
+  if (e.key === 'Enter' || e.key === 'Escape' || e.key === 'k' || e.key === 'j') {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+}
+
+const handleNavControls = (e: React.KeyboardEvent) => {
   // Handle Ctrl+j (move down) and Ctrl+k (move up)
   if (e.ctrlKey && (e.key === 'j' || e.key === 'k')) {
     e.preventDefault()
@@ -61,6 +68,7 @@ export function SuggestionsMenu({
     });
   }, [wordUnderCursor.word])
 
+  // Adjust the rendering position to avoid going off the screen before mounting the component
   useLayoutEffect(() => {
     if (!menuRef.current)
       return
@@ -96,8 +104,8 @@ export function SuggestionsMenu({
     setAdjustedPosition({ x: newX, y: newY })
   }, [position, wordUnderCursor.word])
 
+  // Autofocus when the component mounts
   useEffect(() => {
-    // Auto-focus the command input when component mounts
     if (commandListRef.current) {
       commandListRef.current.focus()
     }
@@ -140,16 +148,17 @@ export function SuggestionsMenu({
     <div
       ref={menuRef}
       style={positioningStyle}
+      onKeyDown={preventControlPropagation}
     >
       <Command
         className={`
           rounded-lg border shadow-md
           md:min-w-[450px]
         `}
+        onKeyDown={handleNavControls}
       >
         <CommandList
           ref={commandListRef}
-          onKeyDown={handleNavKeys}
         >
           <CommandGroup heading="Suggestions">
             <CommandEmpty>No results found.</CommandEmpty>
