@@ -1,3 +1,4 @@
+// oxlint-disable jsx-no-new-function-as-prop
 import { createRoot, type Root } from 'react-dom/client';
 import { createShadowRootUi } from 'wxt/utils/content-script-ui/shadow-root';
 import { defineContentScript } from 'wxt/utils/define-content-script';
@@ -16,11 +17,15 @@ export default defineContentScript({
 
     let ui: Awaited<ReturnType<typeof createShadowRootUi<{ root: Root, wrapper: HTMLDivElement }>>> | undefined;
 
-    const mountSuggestionsMenu = async () => {
-      // remove the ui if it is already mounted
+    const unmountUi = () => {
       if (ui && ui.mounted) {
         ui.remove();
       }
+    }
+
+    const mountSuggestionsMenu = async () => {
+      // remove the ui if it is already mounted
+      unmountUi();
 
       // get the position of the cursor
       const cursorPosition = getSelectionPosition();
@@ -50,6 +55,7 @@ export default defineContentScript({
           const root = createRoot(wrapper);
           root.render(
             <SuggestionsMenu
+              unmountUi={unmountUi}
               wordUnderCursor={wordUnderCursor}
               position={cursorPosition}
             />,

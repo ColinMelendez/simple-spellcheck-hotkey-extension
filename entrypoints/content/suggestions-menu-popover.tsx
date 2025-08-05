@@ -1,3 +1,4 @@
+// oxlint-disable jsx-no-new-function-as-prop explanation: this component doesn't need to be optimized for re-render performance
 import * as Effect from 'effect/Effect'
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
@@ -11,14 +12,7 @@ import {
 import { GetSuggestions, GetSuggestionsResolver } from '@/lib/domain/messaging'
 import { ScriptRuntime } from '@/lib/runtimes/script-runtime'
 
-const preventControlPropagation = (e: React.KeyboardEvent) => {
-  if (e.key === 'Enter' || e.key === 'Escape' || e.key === 'k' || e.key === 'j') {
-    e.preventDefault()
-    e.stopPropagation()
-  }
-}
-
-const handleNavControls = (e: React.KeyboardEvent) => {
+const handleNavKeys = (e: React.KeyboardEvent) => {
   // Handle Ctrl+j (move down) and Ctrl+k (move up)
   if (e.ctrlKey && (e.key === 'j' || e.key === 'k')) {
     e.preventDefault()
@@ -37,6 +31,7 @@ const handleNavControls = (e: React.KeyboardEvent) => {
 export function SuggestionsMenu({
   wordUnderCursor,
   position,
+  unmountUi,
 }: {
   wordUnderCursor: {
     word: string
@@ -47,6 +42,7 @@ export function SuggestionsMenu({
     x: number
     y: number
   }
+  unmountUi: () => void
 }) {
   console.log('wordUnderCursor', wordUnderCursor);
   console.log('cursorPosition', position);
@@ -55,6 +51,19 @@ export function SuggestionsMenu({
   const commandListRef = useRef<HTMLInputElement>(null);
   const [adjustedPosition, setAdjustedPosition] = useState(position);
   const [suggestedWords, setSuggestedWords] = useState<readonly string[]>([]);
+
+  const handleControlKeys = (e: React.KeyboardEvent) => {
+    // prevent leakage of control keys to the document
+    if (e.key === 'Enter' || e.key === 'Escape' || e.key === 'k' || e.key === 'j') {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    // unmount the component when the user presses enter or escape
+    if (e.key === 'Enter' || e.key === 'Escape') {
+      unmountUi();
+      wordUnderCursor.element?.focus();
+    }
+  }
 
   useEffect(() => {
     console.log('running suggestions fetch');
@@ -111,7 +120,22 @@ export function SuggestionsMenu({
     }
   }, [])
 
-  const handleSuggestionSelect = (selectedWord: string) => {
+  // Handle clicks outside the component to unmount
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (event.target instanceof Node
+        && menuRef.current
+        && !menuRef.current.contains(event.target)) {
+        unmountUi();
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [unmountUi]);
+
+  const handleSuggestionSelection = (selectedWord: string) => {
     if (!wordUnderCursor.element || !wordUnderCursor.range) {
       return;
     }
@@ -148,22 +172,22 @@ export function SuggestionsMenu({
     <div
       ref={menuRef}
       style={positioningStyle}
-      onKeyDown={preventControlPropagation}
+      onKeyDown={handleControlKeys}
     >
       <Command
         className={`
           rounded-lg border shadow-md
           md:min-w-[450px]
         `}
-        onKeyDown={handleNavControls}
+        onKeyDown={handleNavKeys}
       >
         <CommandList
           ref={commandListRef}
         >
           <CommandGroup heading="Suggestions">
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty>{`No results found for ${wordUnderCursor.word}.`}</CommandEmpty>
             {suggestedWords.map((word) => (
-              <CommandItem key={word} onSelect={() => handleSuggestionSelect(word)}>
+              <CommandItem key={word} onSelect={() => handleSuggestionSelection(word)}>
                 <span>{word}</span>
               </CommandItem>
             ))}
