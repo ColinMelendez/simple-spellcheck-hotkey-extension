@@ -44,13 +44,10 @@ export function SuggestionsMenu({
   }
   unmountUi: () => void
 }) {
-  console.log('wordUnderCursor', wordUnderCursor);
-  console.log('cursorPosition', position);
-
-  const menuRef = useRef<HTMLDivElement>(null);
-  const commandListRef = useRef<HTMLInputElement>(null);
-  const [adjustedPosition, setAdjustedPosition] = useState(position);
-  const [suggestedWords, setSuggestedWords] = useState<readonly string[]>([]);
+  const menuRef = useRef<HTMLDivElement>(null)
+  const commandListRef = useRef<HTMLInputElement>(null)
+  const [adjustedPosition, setAdjustedPosition] = useState(position)
+  const [suggestedWords, setSuggestedWords] = useState<readonly string[]>([])
 
   const handleControlKeys = (e: React.KeyboardEvent) => {
     // prevent leakage of control keys to the document
@@ -61,20 +58,18 @@ export function SuggestionsMenu({
     // unmount the component when the user presses enter or escape
     if (e.key === 'Enter' || e.key === 'Escape') {
       unmountUi();
-      wordUnderCursor.element?.focus();
+      wordUnderCursor.element?.focus()
     }
   }
 
   useEffect(() => {
-    console.log('running suggestions fetch');
     void ScriptRuntime.runPromise(
       Effect.request(new GetSuggestions({ word: wordUnderCursor.word }), GetSuggestionsResolver),
     ).then((suggestions) => {
-      console.log('suggestions', suggestions);
-      setSuggestedWords(suggestions.words);
+      setSuggestedWords(suggestions.words)
     }).catch((error) => {
-      console.error('error fetching suggestions', error);
-    });
+      console.error('error fetching suggestions', error)
+    })
   }, [wordUnderCursor.word])
 
   // Adjust the rendering position to avoid going off the screen before mounting the component
@@ -86,12 +81,28 @@ export function SuggestionsMenu({
     const viewportWidth = window.innerWidth
     const viewportHeight = window.innerHeight
 
+    // Calculate line height offset to position popup below the text
+    let lineHeightOffset = 20 // default fallback
+    if (wordUnderCursor.element) {
+      const computedStyle = window.getComputedStyle(wordUnderCursor.element)
+      const lineHeight = computedStyle.lineHeight
+      if (lineHeight === 'normal') {
+        // If line-height is 'normal', estimate based on font size
+        const fontSize = Number.parseFloat(computedStyle.fontSize)
+        lineHeightOffset = fontSize * 1.2 // typical line-height multiplier (may be imprecise)
+      }
+      else {
+        // If line-height is not 'normal', use the computed style
+        lineHeightOffset = Number.parseFloat(lineHeight)
+      }
+    }
+
     // Convert position to viewport coordinates for bounds checking
     const viewportX = position.x - window.scrollX
     const viewportY = position.y - window.scrollY
 
     let newX = position.x
-    let newY = position.y
+    let newY = position.y + lineHeightOffset
 
     // Check if menu would go off the right edge of the viewport
     if (viewportX + rect.width > viewportWidth) {
@@ -111,7 +122,7 @@ export function SuggestionsMenu({
     newY = Math.max(minY, newY)
 
     setAdjustedPosition({ x: newX, y: newY })
-  }, [position, wordUnderCursor.word])
+  }, [position, wordUnderCursor.word, wordUnderCursor.element])
 
   // Autofocus when the component mounts
   useEffect(() => {
@@ -126,38 +137,38 @@ export function SuggestionsMenu({
       if (event.target instanceof Node
         && menuRef.current
         && !menuRef.current.contains(event.target)) {
-        unmountUi();
+        unmountUi()
       }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
+    }
+    document.addEventListener('mousedown', handleClickOutside)
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, [unmountUi]);
+      document.removeEventListener('mousedown', handleClickOutside)
+    }
+  }, [unmountUi])
 
   const handleSuggestionSelection = (selectedWord: string) => {
     if (!wordUnderCursor.element || !wordUnderCursor.range) {
-      return;
+      return
     }
 
-    const element = wordUnderCursor.element;
-    const { start, end } = wordUnderCursor.range;
+    const element = wordUnderCursor.element
+    const { start, end } = wordUnderCursor.range
 
     // Replace the text at the specified range
-    const currentValue = element.value;
-    const newValue = currentValue.slice(0, start) + selectedWord + currentValue.slice(end);
-    element.value = newValue;
+    const currentValue = element.value
+    const newValue = currentValue.slice(0, start) + selectedWord + currentValue.slice(end)
+    element.value = newValue
 
     // Set cursor position after the replaced word
-    const newCursorPosition = start + selectedWord.length;
-    element.setSelectionRange(newCursorPosition, newCursorPosition);
+    const newCursorPosition = start + selectedWord.length
+    element.setSelectionRange(newCursorPosition, newCursorPosition)
 
     // Focus back to the original element
-    element.focus();
+    element.focus()
 
     // Trigger input event to notify any listeners of the value change
-    element.dispatchEvent(new Event('input', { bubbles: true }));
-  };
+    element.dispatchEvent(new Event('input', { bubbles: true }))
+  }
 
   const positioningStyle = useMemo(() => {
     return {
