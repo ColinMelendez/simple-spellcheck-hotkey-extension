@@ -1,14 +1,14 @@
 /* eslint-disable ts/unbound-method */
-'use client';
+'use client'
 
-import { type HTMLMotionProps, motion } from 'motion/react';
-import { Checkbox as CheckboxPrimitive } from 'radix-ui';
-import * as React from 'react';
+import { type HTMLMotionProps, motion } from 'motion/react'
+import { Checkbox as CheckboxPrimitive } from 'radix-ui'
+import * as React from 'react'
 
-import { cn } from '@/lib/utils/cn';
+import { cn } from '@/lib/utils/cn'
 
-const whileTapStyle = { scale: 0.95 } as const;
-const whileHoverStyle = { scale: 1.05 } as const;
+const whileTapStyle = { scale: 0.95 } as const
+const whileHoverStyle = { scale: 1.05 } as const
 const checkmarkStrokeAnimationVariants = {
   checked: {
     pathLength: 1,
@@ -24,12 +24,12 @@ const checkmarkStrokeAnimationVariants = {
       duration: 0.2,
     },
   },
-} as const;
+} as const
 
-type CheckedState = CheckboxPrimitive.CheckedState;
+type CheckedState = CheckboxPrimitive.CheckedState
 
 type CheckboxProps = React.ComponentProps<typeof CheckboxPrimitive.Root>
-  & HTMLMotionProps<'button'>;
+  & HTMLMotionProps<'button'>
 
 const Checkbox = ({
   className,
@@ -39,22 +39,22 @@ const Checkbox = ({
 ) => {
   const [isChecked_InternallyControlled, setIsChecked_InternallyControlled] = React.useState<CheckedState>(
     props?.defaultChecked ?? false,
-  );
+  )
 
-  const externallyControlled = props?.checked !== undefined;
-  const isChecked = externallyControlled ? props?.checked : isChecked_InternallyControlled;
+  const externallyControlled = props?.checked !== undefined
+  const isChecked = externallyControlled ? props?.checked : isChecked_InternallyControlled
 
   const handleCheckedChange = React.useCallback(
     (nextIsChecked: CheckedState) => {
       if (!externallyControlled) {
-        setIsChecked_InternallyControlled(nextIsChecked);
+        setIsChecked_InternallyControlled(nextIsChecked)
       }
       else if (onCheckedChange !== undefined) {
-        onCheckedChange(nextIsChecked);
+        onCheckedChange(nextIsChecked)
       }
     },
     [externallyControlled, onCheckedChange],
-  );
+  )
 
   return (
     <CheckboxPrimitive.Root
@@ -99,7 +99,7 @@ const Checkbox = ({
         </CheckboxPrimitive.Indicator>
       </motion.button>
     </CheckboxPrimitive.Root>
-  );
+  )
 }
 
-export { Checkbox, type CheckboxProps, type CheckedState };
+export { Checkbox, type CheckboxProps, type CheckedState }

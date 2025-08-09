@@ -6,14 +6,14 @@ export const getWordUnderCursor = ():
   | { word: string, element?: HTMLTextAreaElement | HTMLInputElement, range?: { start: number, end: number } }
   | undefined => {
   // First, check if we're dealing with a form element (textarea or input)
-  const activeElement = document.activeElement;
+  const activeElement = document.activeElement
   if (activeElement && (activeElement.tagName === 'TEXTAREA' || activeElement.tagName === 'INPUT')) {
     // safe to cast as we've already checked the tagName
-    const formElement = activeElement as HTMLTextAreaElement | HTMLInputElement;
+    const formElement = activeElement as HTMLTextAreaElement | HTMLInputElement
 
     // Only handle text-based inputs
     if (formElement.tagName === 'INPUT') {
-      const inputElement = formElement as HTMLInputElement;
+      const inputElement = formElement as HTMLInputElement
       if (inputElement.type !== 'text'
         && inputElement.type !== 'textarea'
         && inputElement.type !== 'password'
@@ -21,48 +21,48 @@ export const getWordUnderCursor = ():
         && inputElement.type !== 'email'
         && inputElement.type !== 'url'
       ) {
-        return undefined;
+        return undefined
       }
     }
 
-    const result = extractWordFromFormElement(formElement);
+    const result = extractWordFromFormElement(formElement)
     if (result) {
       return {
         word: result.word,
         element: formElement,
         range: result.range,
-      };
+      }
     }
-    return undefined;
+    return undefined
   }
 
   // Fall back to selection-based extraction for contentEditable and regular text
-  const selection = window.getSelection();
+  const selection = window.getSelection()
   if (!selection || selection.rangeCount === 0) {
-    return undefined;
+    return undefined
   }
 
-  const range = selection.getRangeAt(0);
-  const { startContainer, startOffset } = range;
+  const range = selection.getRangeAt(0)
+  const { startContainer, startOffset } = range
 
   // For selections, use the start position; for cursor, use the position
-  const container = startContainer;
-  const offset = startOffset;
+  const container = startContainer
+  const offset = startOffset
 
   // Make sure we're working with a text node
   if (container.nodeType !== Node.TEXT_NODE) {
     // If it's not a text node, try to find a text node child
-    const textNode = findTextNodeAtPosition(container, offset);
+    const textNode = findTextNodeAtPosition(container, offset)
     if (!textNode) {
-      return undefined;
+      return undefined
     }
-    const result = extractWordAtOffset(textNode.node, textNode.offset);
-    return result ? { word: result.word } : undefined;
+    const result = extractWordAtOffset(textNode.node, textNode.offset)
+    return result ? { word: result.word } : undefined
   }
 
-  const result = extractWordAtOffset(container as Text, offset);
-  return result ? { word: result.word } : undefined;
-};
+  const result = extractWordAtOffset(container as Text, offset)
+  return result ? { word: result.word } : undefined
+}
 
 /**
  * Find the text node at (intersected by) a given offset in a container
@@ -73,32 +73,32 @@ export const getWordUnderCursor = ():
 function findTextNodeAtPosition(container: Node, offset: number): { node: Text, offset: number } | undefined {
   // If container is an element, find the text node at the given offset
   if (container.nodeType === Node.ELEMENT_NODE) {
-    const childNodes = Array.from(container.childNodes);
-    let currentOffset = 0;
+    const childNodes = Array.from(container.childNodes)
+    let currentOffset = 0
 
     for (const child of childNodes) {
       if (child.nodeType === Node.TEXT_NODE) {
-        const textContent = (child as Text).textContent;
-        const textLength = textContent !== null ? textContent.length : 0;
+        const textContent = (child as Text).textContent
+        const textLength = textContent !== null ? textContent.length : 0
         if (currentOffset + textLength > offset) {
-          return { node: child as Text, offset: offset - currentOffset };
+          return { node: child as Text, offset: offset - currentOffset }
         }
-        currentOffset += textLength;
+        currentOffset += textLength
       }
       else if (child.nodeType === Node.ELEMENT_NODE) {
         // For element nodes, treat them as single positions
         if (currentOffset === offset) {
           // Find the first text node in this element
-          const firstTextNode = findFirstTextNode(child);
+          const firstTextNode = findFirstTextNode(child)
           if (firstTextNode) {
-            return { node: firstTextNode, offset: 0 };
+            return { node: firstTextNode, offset: 0 }
           }
         }
-        currentOffset += 1;
+        currentOffset += 1
       }
     }
   }
-  return undefined;
+  return undefined
 }
 
 /**
@@ -108,16 +108,16 @@ function findTextNodeAtPosition(container: Node, offset: number): { node: Text, 
  */
 function findFirstTextNode(node: Node): Text | undefined {
   if (node.nodeType === Node.TEXT_NODE) {
-    return node as Text;
+    return node as Text
   }
 
   for (const child of Array.from(node.childNodes)) {
-    const textNode = findFirstTextNode(child);
+    const textNode = findFirstTextNode(child)
     if (textNode) {
-      return textNode;
+      return textNode
     }
   }
-  return undefined;
+  return undefined
 }
 
 /**
@@ -127,9 +127,9 @@ function findFirstTextNode(node: Node): Text | undefined {
  */
 function isAlphabetic(char: string | undefined): boolean {
   if (char === undefined) {
-    return false;
+    return false
   }
-  return /^[a-z]$/i.test(char);
+  return /^[a-z]$/i.test(char)
 }
 
 /**
@@ -138,15 +138,15 @@ function isAlphabetic(char: string | undefined): boolean {
  * @returns The word under the cursor and its range, or undefined if no word is found
  */
 function extractWordFromFormElement(element: HTMLTextAreaElement | HTMLInputElement): { word: string, range: { start: number, end: number } } | undefined {
-  const text = element.value;
-  const cursorPosition = element.selectionStart;
+  const text = element.value
+  const cursorPosition = element.selectionStart
 
   if (cursorPosition === null || text.length === 0) {
-    return undefined;
+    return undefined
   }
 
   // Use the same word extraction logic as the text node version
-  return extractWordAtTextPosition(text, cursorPosition);
+  return extractWordAtTextPosition(text, cursorPosition)
 }
 
 /**
@@ -158,41 +158,41 @@ function extractWordFromFormElement(element: HTMLTextAreaElement | HTMLInputElem
 function extractWordAtTextPosition(text: string, offset: number): { word: string, range: { start: number, end: number } } | undefined {
   // Ensure offset is within bounds
   if (offset < 0 || offset > text.length) {
-    return undefined;
+    return undefined
   }
 
   // If we're at the very end, move back one position
-  const adjustedOffset = offset === text.length ? offset - 1 : offset;
+  const adjustedOffset = offset === text.length ? offset - 1 : offset
 
   // Check if the character at the offset is alphabetic
-  const charAtCursor = text[adjustedOffset];
+  const charAtCursor = text[adjustedOffset]
   if (adjustedOffset < 0 || !isAlphabetic(charAtCursor)) {
-    return undefined;
+    return undefined
   }
 
   // Find the start of the word (go backwards until non-alphabetic)
-  let start = adjustedOffset;
+  let start = adjustedOffset
   while (start > 0) {
-    const prevChar = text[start - 1];
+    const prevChar = text[start - 1]
     if (!isAlphabetic(prevChar)) {
-      break;
+      break
     }
-    start--;
+    start--
   }
 
   // Find the end of the word (go forwards until non-alphabetic)
-  let end = adjustedOffset;
+  let end = adjustedOffset
   while (end < text.length - 1) {
-    const nextChar = text[end + 1];
+    const nextChar = text[end + 1]
     if (!isAlphabetic(nextChar)) {
-      break;
+      break
     }
-    end++;
+    end++
   }
 
   // Extract the word
-  const word = text.substring(start, end + 1);
-  return word.length > 0 ? { word, range: { start, end: end + 1 } } : undefined;
+  const word = text.substring(start, end + 1)
+  return word.length > 0 ? { word, range: { start, end: end + 1 } } : undefined
 }
 
 /**
@@ -202,10 +202,10 @@ function extractWordAtTextPosition(text: string, offset: number): { word: string
  * @returns The word at the offset and its range, or undefined if the offset is out of bounds or the character is not alphabetic
  */
 function extractWordAtOffset(textNode: Text, offset: number): { word: string, range: { start: number, end: number } } | undefined {
-  const textContent = textNode.textContent;
+  const textContent = textNode.textContent
   if (textContent === null) {
-    return undefined;
+    return undefined
   }
 
-  return extractWordAtTextPosition(textContent, offset);
+  return extractWordAtTextPosition(textContent, offset)
 }

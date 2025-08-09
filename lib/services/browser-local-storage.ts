@@ -1,6 +1,6 @@
-import * as Data from 'effect/Data';
-import * as Effect from 'effect/Effect';
-import { browser } from 'wxt/browser';
+import * as Data from 'effect/Data'
+import * as Effect from 'effect/Effect'
+import { browser } from 'wxt/browser'
 
 export class BrowserLocalStorageError<T = unknown> extends Data.TaggedClass('BrowserLocalStorageError')<{
   cause: T
@@ -8,7 +8,7 @@ export class BrowserLocalStorageError<T = unknown> extends Data.TaggedClass('Bro
 
 export class BrowserLocalStorage extends Effect.Service<BrowserLocalStorage>()('BrowserLocalStorage', {
   effect: Effect.gen(function* () {
-    const storage = browser.storage.local;
+    const storage = browser.storage.local
 
     /**
      * Use the wrapped browser storage instance for any of it's internal methods, safely wrapped in an effect.
@@ -20,10 +20,10 @@ export class BrowserLocalStorage extends Effect.Service<BrowserLocalStorage>()('
       Effect.tryPromise({
         try: async () => f(storage),
         catch: (cause) => new BrowserLocalStorageError({ cause }),
-      });
+      })
 
     return {
       use,
-    } as const;
+    } as const
   }),
 }) {}

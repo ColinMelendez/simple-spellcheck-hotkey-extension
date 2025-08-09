@@ -1,8 +1,8 @@
-import * as Data from 'effect/Data';
-import * as Effect from 'effect/Effect';
-import Typo from 'typo-js';
-import { affData } from '@/lib/domain/spellcheck-affixes-en-us';
-import { dicData } from '@/lib/domain/spellcheck-dict-en-us';
+import * as Data from 'effect/Data'
+import * as Effect from 'effect/Effect'
+import Typo from 'typo-js'
+import { affData } from '@/lib/domain/spellcheck-affixes-en-us'
+import { dicData } from '@/lib/domain/spellcheck-dict-en-us'
 
 export class SpellcheckError<T = unknown> extends Data.TaggedClass('SpellcheckError')<{
   cause: T
@@ -12,7 +12,7 @@ export class SpellcheckError<T = unknown> extends Data.TaggedClass('SpellcheckEr
 export class Spellcheck extends Effect.Service<Spellcheck>()('Spellcheck', {
   effect: Effect.gen(function* () {
     // Create typo instance with manually loaded data
-    const checker = new Typo('en_US', affData, dicData);
+    const checker = new Typo('en_US', affData, dicData)
 
     /**
      * Use the wrapped spellchecker instance for any of it's internal methods, safely wrapped in an effect.
@@ -24,10 +24,10 @@ export class Spellcheck extends Effect.Service<Spellcheck>()('Spellcheck', {
       Effect.try({
         try: () => f(checker),
         catch: (cause) => new SpellcheckError({ cause }),
-      });
+      })
 
     return {
       use,
-    } as const;
+    } as const
   }),
 }) {}

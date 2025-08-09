@@ -23,5 +23,5 @@ export const App = () => {
         </p>
       </div>
     </div>
-  );
+  )
 }

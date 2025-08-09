@@ -1,8 +1,8 @@
-import * as Effect from 'effect/Effect';
-import { useCallback, useLayoutEffect, useState } from 'react';
-import { usePermissionsRuntime } from '@/lib/runtimes/react-runtimes';
-import { BrowserTabPermissions } from '@/lib/services/browser-tab-permissions';
-import { BrowserTabs } from '@/lib/services/browser-tabs';
+import * as Effect from 'effect/Effect'
+import { useCallback, useLayoutEffect, useState } from 'react'
+import { usePermissionsRuntime } from '@/lib/runtimes/react-runtimes'
+import { BrowserTabPermissions } from '@/lib/services/browser-tab-permissions'
+import { BrowserTabs } from '@/lib/services/browser-tabs'
 
 /**
  * A hook to manage the permission state of the current tab
@@ -25,15 +25,15 @@ export const usePermissions = (): {
    */
   isScriptable: boolean
 } => {
-  const [pagePermissionState, setPagePermissionState] = useState(false);
-  const [tabUrl, setTabUrl] = useState<string>('');
-  const [isScriptable, setIsScriptable] = useState(true);
+  const [pagePermissionState, setPagePermissionState] = useState(false)
+  const [tabUrl, setTabUrl] = useState<string>('')
+  const [isScriptable, setIsScriptable] = useState(true)
 
   const togglePermissionState = useCallback((targetState: boolean) => {
     void Effect.asVoid(BrowserTabPermissions.pipe(
       Effect.flatMap((self) => self.toggleTabPermission(tabUrl, targetState)),
       Effect.tap((hasPermission) => {
-        setPagePermissionState(hasPermission);
+        setPagePermissionState(hasPermission)
       }),
     )).pipe(
       Effect.catchTags({
@@ -48,12 +48,12 @@ export const usePermissions = (): {
       const url = yield* BrowserTabs.pipe(
         Effect.flatMap((self) => self.currentTabUrl),
         Effect.tap((url) => setTabUrl(url)),
-      );
+      )
       yield* BrowserTabPermissions.pipe(
         Effect.tap((self) => setIsScriptable(self.isScriptableByUrl(url))),
         Effect.flatMap((self) => self.checkTabPermissionByUrl(url)),
         Effect.tap((hasPermission) => setPagePermissionState(hasPermission)),
-      );
+      )
     }).pipe(
       Effect.catchTags({
         BrowserPermissionsError: (error) => Effect.logError(error),
@@ -69,5 +69,5 @@ export const usePermissions = (): {
     togglePermissionState,
     tabUrl,
     isScriptable,
-  } as const;
+  } as const
 }

@@ -57,7 +57,7 @@ export function SuggestionsMenu({
     }
     // unmount the component when the user presses enter or escape
     if (e.key === 'Enter' || e.key === 'Escape') {
-      unmountUi();
+      unmountUi()
       wordUnderCursor.element?.focus()
     }
   }

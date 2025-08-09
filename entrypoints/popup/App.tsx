@@ -1,4 +1,4 @@
-import { ModeToggle } from '@/components/popup/dark-mode-toggle';
+import { ModeToggle } from '@/components/popup/dark-mode-toggle'
 
 export const App = () => {
   return (
@@ -10,5 +10,5 @@ export const App = () => {
         <h1 className="text-xl leading-tight">Text Scrambler Settings</h1>
       </div>
     </div>
-  );
+  )
 }

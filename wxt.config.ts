@@ -1,6 +1,6 @@
-import path from 'node:path';
+import path from 'node:path'
 import tailwindcss from '@tailwindcss/vite'
-import { defineConfig } from 'wxt';
+import { defineConfig } from 'wxt'
 
 // See https://wxt.dev/api/config.html
 export default defineConfig({
@@ -41,12 +41,12 @@ export default defineConfig({
         // So we need to add them manually.
         // each content script should have it's triggers (value of the `matches` key in it's index.ts) and
         // the output js file it compiles to listed here to work.
-        manifest.content_scripts ??= [];
+        manifest.content_scripts ??= []
         manifest.content_scripts.push({
           matches: ['*://*/*'],
           js: ['/content-scripts/content.js'],
           // If the script has CSS, add it here.
-        });
+        })
       }
     },
   },
@@ -59,4 +59,4 @@ export default defineConfig({
   },
   // Disable WXT auto-imports - use manual imports instead
   imports: false,
-});
+})

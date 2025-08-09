@@ -1,6 +1,6 @@
-import antfu from '@antfu/eslint-config';
-import eslintPluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss';
-import oxlint from 'eslint-plugin-oxlint';
+import antfu from '@antfu/eslint-config'
+import eslintPluginBetterTailwindcss from 'eslint-plugin-better-tailwindcss'
+import oxlint from 'eslint-plugin-oxlint'
 
 // TIP: to view which rules are enabled, run `pnpx @eslint/config-inspector`
 
@@ -30,9 +30,6 @@ export default antfu({
   rules: {
     // allow console.logs
     'no-console': 'off',
-
-    // enforce semicolons at the end of statements
-    'style/semi': ['off', 'always'],
 
     // lambda functions should always use argument parenthesis (two overlapping rules)
     'style/arrow-parens': ['error', 'always'],
@@ -73,4 +70,4 @@ export default antfu({
 }).append(
   // oxlint compat plugin needs to come after everything else so that it can properly override rules
   oxlint.buildFromOxlintConfigFile('./.oxlintrc.json'),
-);
+)

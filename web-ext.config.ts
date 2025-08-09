@@ -1,4 +1,4 @@
-import { defineWebExtConfig } from 'wxt';
+import { defineWebExtConfig } from 'wxt'
 
 export default defineWebExtConfig({
   // IMPORTANT: install the puppeteer browser binaries and specify the paths here for development
@@ -8,4 +8,4 @@ export default defineWebExtConfig({
     // ------ other browsers can be included in the same format as above --------
     // edge: '/path/to/edge', // Open MS Edge when running "wxt -b edge"
   },
-});
+})

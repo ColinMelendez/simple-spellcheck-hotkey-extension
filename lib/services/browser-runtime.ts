@@ -3,9 +3,9 @@
  * the extension browser runtime namespace effectfully.
  */
 
-import * as Data from 'effect/Data';
-import * as Effect from 'effect/Effect';
-import { browser } from 'wxt/browser';
+import * as Data from 'effect/Data'
+import * as Effect from 'effect/Effect'
+import { browser } from 'wxt/browser'
 
 export class BrowserRuntimeError<T = unknown> extends Data.TaggedClass('BrowserRuntimeError')<{
   cause: T
@@ -17,7 +17,7 @@ export class SendMessageError<T = unknown> extends Data.TaggedClass('SendMessage
 
 export class BrowserRuntime extends Effect.Service<BrowserRuntime>() ('BrowserRuntime', {
   effect: Effect.gen(function* () {
-    const runtime = browser.runtime;
+    const runtime = browser.runtime
 
     /**
      * Use the wrapped browser runtime instance for any of it's synchronous internal methods, safely wrapped in an effect.
@@ -29,7 +29,7 @@ export class BrowserRuntime extends Effect.Service<BrowserRuntime>() ('BrowserRu
       Effect.try({
         try: () => f(runtime),
         catch: (cause) => new BrowserRuntimeError({ cause }),
-      });
+      })
 
     /**
      * Send a message with the browser runtime and return the response in an effect.
@@ -41,11 +41,11 @@ export class BrowserRuntime extends Effect.Service<BrowserRuntime>() ('BrowserRu
       Effect.tryPromise({
         try: async <Response = unknown>(): Promise<Response> => runtime.sendMessage(message),
         catch: (cause) => new SendMessageError({ cause }),
-      });
+      })
 
     return {
       use,
       sendMessage,
-    } as const;
+    } as const
   }),
 }) {}

@@ -1,5 +1,5 @@
-import { defineConfig } from 'vitest/config';
-import { WxtVitest } from 'wxt/testing';
+import { defineConfig } from 'vitest/config'
+import { WxtVitest } from 'wxt/testing'
 
 export default defineConfig({
   // @ts-expect-error - WxtVitest does function properly here.
@@ -7,4 +7,4 @@ export default defineConfig({
   test: {
     setupFiles: ['test-setup.ts'],
   },
-});
+})

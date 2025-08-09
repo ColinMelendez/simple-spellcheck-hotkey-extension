@@ -1,12 +1,12 @@
-import * as Effect from 'effect/Effect';
-import { CircleQuestionMarkIcon } from 'lucide-react';
-import { useCallback } from 'react';
-import { browser } from 'wxt/browser';
-import { usePermissions } from '@/hooks/use-permissions';
-import { permissionsToggleRuntime } from '@/lib/runtimes/react-runtimes';
-import { BrowserTabs } from '@/lib/services/browser-tabs';
-import { Checkbox, type CheckedState } from '../ui/checkbox';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/primitives/tooltip';
+import * as Effect from 'effect/Effect'
+import { CircleQuestionMarkIcon } from 'lucide-react'
+import { useCallback } from 'react'
+import { browser } from 'wxt/browser'
+import { usePermissions } from '@/hooks/use-permissions'
+import { permissionsToggleRuntime } from '@/lib/runtimes/react-runtimes'
+import { BrowserTabs } from '@/lib/services/browser-tabs'
+import { Checkbox, type CheckedState } from '../ui/checkbox'
+import { Tooltip, TooltipContent, TooltipTrigger } from '../ui/primitives/tooltip'
 
 const disableScrambleScript = (url: string) => {
   void Effect.flatMap(
@@ -17,10 +17,10 @@ const disableScrambleScript = (url: string) => {
           if (tab.id !== undefined) {
             void browser.tabs.sendMessage(tab.id, {
               messageCategory: 'disable-scramble',
-            });
+            })
           }
         }
-      });
+      })
     }),
   ).pipe(
     Effect.catchTags({
@@ -28,18 +28,18 @@ const disableScrambleScript = (url: string) => {
     }),
     permissionsToggleRuntime.runPromise,
   )
-};
+}
 
 export const PermissionsToggle = () => {
-  const { pagePermissionState, togglePermissionState, tabUrl, isScriptable } = usePermissions();
+  const { pagePermissionState, togglePermissionState, tabUrl, isScriptable } = usePermissions()
 
   const setPermissions = useCallback((nextState: CheckedState) => {
     if (nextState === true) {
-      togglePermissionState(true);
+      togglePermissionState(true)
     }
     else {
-      togglePermissionState(false);
-      void disableScrambleScript(tabUrl);
+      togglePermissionState(false)
+      void disableScrambleScript(tabUrl)
     }
   }, [togglePermissionState, tabUrl])
 
@@ -77,5 +77,5 @@ export const PermissionsToggle = () => {
         </div>
       )}
     </div>
-  );
-};
+  )
+}

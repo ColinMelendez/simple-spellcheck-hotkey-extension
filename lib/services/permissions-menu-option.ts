@@ -1,6 +1,6 @@
-import * as Data from 'effect/Data';
-import * as Effect from 'effect/Effect';
-import addPermissionToggle from 'webext-permission-toggle';
+import * as Data from 'effect/Data'
+import * as Effect from 'effect/Effect'
+import addPermissionToggle from 'webext-permission-toggle'
 
 class PermissionsMenuOptionError<T = unknown> extends Data.TaggedClass('PermissionsMenuOptionError')<{
   cause: T
@@ -16,10 +16,10 @@ export class PermissionsMenuOption extends Effect.Service<PermissionsMenuOption>
     const toggle = Effect.try({
       try: () => addPermissionToggle(),
       catch: (cause) => new PermissionsMenuOptionError({ cause }),
-    });
+    })
 
     return {
       toggle,
-    } as const;
+    } as const
   }),
 }) {}

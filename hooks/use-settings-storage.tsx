@@ -1,11 +1,11 @@
-import * as Effect from 'effect/Effect';
-import * as Schema from 'effect/Schema';
-import { useCallback, useEffect, useState } from 'react';
-import { browser, type Browser } from 'wxt/browser';
-import { DEFAULT_SETTINGS, SETTINGS_STORAGE_KEY } from '@/lib/domain/global-defaults';
-import { Settings } from '@/lib/domain/settings-schema';
-import { useSettingsStorageRuntime } from '@/lib/runtimes/react-runtimes';
-import { BrowserLocalStorage } from '@/lib/services/browser-local-storage';
+import * as Effect from 'effect/Effect'
+import * as Schema from 'effect/Schema'
+import { useCallback, useEffect, useState } from 'react'
+import { browser, type Browser } from 'wxt/browser'
+import { DEFAULT_SETTINGS, SETTINGS_STORAGE_KEY } from '@/lib/domain/global-defaults'
+import { Settings } from '@/lib/domain/settings-schema'
+import { useSettingsStorageRuntime } from '@/lib/runtimes/react-runtimes'
+import { BrowserLocalStorage } from '@/lib/services/browser-local-storage'
 
 // See useSettingsStore exports
 const updateSettingsStorage = (updatedSettings: Settings) => {
@@ -17,14 +17,14 @@ const updateSettingsStorage = (updatedSettings: Settings) => {
         void storage.set({
           [SETTINGS_STORAGE_KEY]: value,
         })),
-    );
+    )
   }).pipe(
     Effect.catchTags({
       BrowserLocalStorageError: (error) => Effect.logError(error),
       ParseError: (error) => Effect.logError(error),
     }),
     useSettingsStorageRuntime.runPromise,
-  );
+  )
 }
 
 /**
@@ -42,21 +42,21 @@ export const useSettingsStorage = (): {
    */
   updateSettingsStorage: (updatedSettings: Settings) => void
 } => {
-  const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+  const [settings, setSettings] = useState(DEFAULT_SETTINGS)
 
   const onLocalStorageSettingsChange = useCallback((changes: Record<string, Browser.storage.StorageChange>) => {
     void Effect.gen(function* () {
       if (changes[SETTINGS_STORAGE_KEY]) {
         const value = yield* Schema.decodeUnknown(Settings)(changes[SETTINGS_STORAGE_KEY].newValue)
-        setSettings(value);
+        setSettings(value)
       }
     }).pipe(
       Effect.catchTags({
         ParseError: (error) => Effect.logError(error),
       }),
       useSettingsStorageRuntime.runPromise,
-    );
-  }, []);
+    )
+  }, [])
 
   // On initial load, get the latest settings from storage and listen for changes
   useEffect(() => {
@@ -71,17 +71,17 @@ export const useSettingsStorage = (): {
         BrowserLocalStorageError: (error) => Effect.logError(error),
       }),
       useSettingsStorageRuntime.runPromise,
-    );
+    )
 
-    browser.storage.local.onChanged.addListener(onLocalStorageSettingsChange);
+    browser.storage.local.onChanged.addListener(onLocalStorageSettingsChange)
 
     return () => {
-      browser.storage.local.onChanged.removeListener(onLocalStorageSettingsChange);
-    };
-  }, [onLocalStorageSettingsChange]);
+      browser.storage.local.onChanged.removeListener(onLocalStorageSettingsChange)
+    }
+  }, [onLocalStorageSettingsChange])
 
   return {
     settings,
     updateSettingsStorage,
-  } as const;
+  } as const
 }

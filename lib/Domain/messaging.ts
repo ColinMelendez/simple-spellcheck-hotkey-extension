@@ -3,17 +3,17 @@
  * various extension contexts.
  */
 
-import type { Browser } from 'wxt/browser';
-import * as Data from 'effect/Data';
-import * as Duration from 'effect/Duration';
-import * as Effect from 'effect/Effect';
-import * as Match from 'effect/Match';
-import * as Request from 'effect/Request';
-import * as RequestResolver from 'effect/RequestResolver';
-import * as Schedule from 'effect/Schedule';
-import * as Schema from 'effect/Schema';
-import { BrowserRuntime } from '@/lib/services/browser-runtime';
-import { Spellcheck, SpellcheckError } from '@/lib/services/spellcheck';
+import type { Browser } from 'wxt/browser'
+import * as Data from 'effect/Data'
+import * as Duration from 'effect/Duration'
+import * as Effect from 'effect/Effect'
+import * as Match from 'effect/Match'
+import * as Request from 'effect/Request'
+import * as RequestResolver from 'effect/RequestResolver'
+import * as Schedule from 'effect/Schedule'
+import * as Schema from 'effect/Schema'
+import { BrowserRuntime } from '@/lib/services/browser-runtime'
+import { Spellcheck, SpellcheckError } from '@/lib/services/spellcheck'
 
 // ------------------------------
 // Data Schemas

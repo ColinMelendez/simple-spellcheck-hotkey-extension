@@ -5,23 +5,23 @@
 class ESBuildAndJSDOMCompatibleTextEncoder extends TextEncoder {
   override encode(input: string) {
     if (typeof input !== 'string') {
-      throw new TypeError('`input` must be a string');
+      throw new TypeError('`input` must be a string')
     }
 
-    const decodedURI = decodeURIComponent(encodeURIComponent(input));
-    const arr = new Uint8Array(decodedURI.length);
-    const chars = decodedURI.split('');
+    const decodedURI = decodeURIComponent(encodeURIComponent(input))
+    const arr = new Uint8Array(decodedURI.length)
+    const chars = decodedURI.split('')
     for (let i = 0; i < chars.length; i++) {
-      const charCode = decodedURI[i]?.charCodeAt(0);
+      const charCode = decodedURI[i]?.charCodeAt(0)
       if (charCode !== undefined) {
-        arr[i] = charCode;
+        arr[i] = charCode
       }
       else {
-        throw new Error(`Unexpected undefined character code: ${decodedURI[i]}`);
+        throw new Error(`Unexpected undefined character code: ${decodedURI[i]}`)
       }
     }
-    return arr;
+    return arr
   }
 }
 
-global.TextEncoder = ESBuildAndJSDOMCompatibleTextEncoder;
+global.TextEncoder = ESBuildAndJSDOMCompatibleTextEncoder
