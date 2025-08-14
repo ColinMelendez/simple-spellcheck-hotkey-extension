@@ -1,5 +1,3 @@
-import { Textarea } from '@/components/ui/primitives/textarea'
-
 export const App = () => {
   return (
     <div className="mx-auto flex max-w-2xl flex-col items-center justify-center gap-4 self-center py-8 text-center">
@@ -15,16 +13,6 @@ export const App = () => {
       <p className="text-lg">
         Once pinned, you can click the extension icon to open the settings menu and enable/disable the extension, and manage the words you have added to the extension's suggestions dictionary.
       </p>
-      <p className="text-lg">
-        Try it out below!
-      </p>
-      <hr className="my-4 w-full border-border" />
-      <div className="mx-auto flex min-w-lg flex-col border-2 border-accent p-4 pb-8 text-center">
-        <Textarea
-          placeholder="Type some text to experiment..."
-          className="min-h-40 w-full"
-        />
-      </div>
     </div>
   )
 }

@@ -7,7 +7,7 @@ export const App = () => {
         <ModeToggle />
       </div>
       <div className="flex flex-col gap-10">
-        <h1 className="text-xl leading-tight">Text Scrambler Settings</h1>
+        <h1 className="text-xl leading-tight">Simple Autocorrect Settings</h1>
       </div>
     </div>
   )
