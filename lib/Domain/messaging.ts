@@ -82,7 +82,7 @@ const requestSuggestionsHandler = Effect.fn('RequestSuggestionsHandler')(
   ) {
     yield* Spellcheck.pipe(
       Effect.flatMap((spellcheck) =>
-        spellcheck.use((checker) => checker.suggest(request.word)),
+        spellcheck.suggest(request.word),
       ),
       Effect.andThen((words) => Suggestions.make({ words })),
       Effect.tap(sendResponse),
